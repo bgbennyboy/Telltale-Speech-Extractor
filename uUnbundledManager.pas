@@ -1,9 +1,9 @@
 {
-*********************************
+******************************************************
   Telltale Speech Extractor
-  By Bgbennyboy
+  Copyright (c) 2007 - 2011 Bgbennyboy
   Http://quick.mixnmojo.com
-*********************************
+******************************************************
 }
 
 unit uUnbundledManager;
