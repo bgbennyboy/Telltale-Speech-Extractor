@@ -18,19 +18,19 @@
 		<span class="style10">
 			Telltale Speech Extractor<br>
 			By Bgbennyboy<br>
-			Version 1.3.6.5<br>
+			Version 1.3.6.6<br>
 			<a href="http://quick.mixnmojo.com">Http://quick.mixnmojo.com</a><br><br>
 		</span>
 	</span>
 
-	<p class="style7"><strong><em>New in this version (1.3.6.5):</em></strong></p>
+	<p class="style7"><strong><em>New in this version (1.3.6.6):</em></strong></p>
 	<ul>
-		<li class="style7">Added support for Puzzle Agent 2, Hector 102  - Senseless Acts of Justice and Hector 103 - Beyond Reasonable Doom.</li><br>	
+		<li class="style7">Added support for Jurassic Park, Law & Order Legacies and The Walking Dead episodes 1 and 2.</li><br>	
 	</ul>
 	
-	<p class="style7"><strong><em>New in the previous version (1.3.6.4):</em></strong></p>
+	<p class="style7"><strong><em>New in the previous version (1.3.6.5):</em></strong></p>
 	<ul>
-		<li class="style7">Added support for Back To The Future 105 - Outa Time.</li><br>	
+		<li class="style7">Added support for Puzzle Agent 2, Hector 102  - Senseless Acts of Justice and Hector 103 - Beyond Reasonable Doom.</li><br>	
 	</ul>
 
 	
@@ -59,6 +59,8 @@
 		<li>Senseless Acts of Justice</li>
 		<li>Beyond Reasonable Doom</li>		
 		</ul>
+		<li>Jurassic Park</li>	
+		<li>Law & Order: Legacies</li>
 		<li>Nelson Tethers - Puzzle Agent</li>
 		<ul>
 		<li>Episode 1</li>
@@ -103,6 +105,11 @@
 		<li>Lair of the Leviathan</li>
 		<li>The Trial and Execution of Guybrush Threepwood</li>
 		<li>Rise of the Pirate God</li>
+		</ul>	
+		<li>The Walking Dead</li>
+		<ul>	
+		<li>Episode 1: A New Day</li>
+		<li>Episode 2: Starved For Help</li>
 		</ul>			
 		<li>Telltale Texas Hold&rsquo;em</li>
 		<li>Wallace and Gromit&rsquo;s Grand Adventure</li>
@@ -162,12 +169,13 @@
 	<p class="style7">
 		<em><strong>Technical details:</strong></em>
 		<br>
-		The speech files used in Telltale games have changed over time, generally speaking there are 3 types of audio file used:<br>
+		The speech files used in Telltale games have changed over time, generally speaking there are 4 types of audio file used:<br>
 		
 		<ul class="style7">
 		<li>(.VOX) Vox V1 - These use the Speex codec to store the speech, however the Speex data is not stored in a vorbis container. The audio is divided up into 'packets', some of which are encrypted.</li><br>
 		<li>(.VOX) Vox V2 - These are esentially the same as Vox V1 - but the file header is different and there's no encryption.</li><br>
 		<li>(.AUD) Ogg audio - These are standard Ogg files with an extra header. The format of the header is not always the same and changes between games.</li><br>
+		<li>(.FSB) FSB audio - So far only seen in The Walking Dead, these are standard FSB files.</li><br>
 		</ul>		
 		
 		<p class="style7">
@@ -203,6 +211,11 @@
 			<li>V2 VOX files packed inside a different format, compressed and even more encrypted .ttarch bundle.</li>
 			<ul>
 								<li>Poker Night At The Inventory and CSI Fatal Conspiracy.</li>
+			</ul><br>		
+			
+			<li>FSB files packed inside a compressed and even more encrypted .ttarch bundle.</li>
+			<ul>
+								<li>The Walking Dead.</li>
 			</ul>	
 			
 		</ul>
@@ -273,6 +286,6 @@
 	</p>
 	
 	<br>
-	<p class="style7 style12">bgbennyboy 25/09/11 </p>
+	<p class="style7 style12">bgbennyboy 24/07/12 </p>
 </body>
 </html>

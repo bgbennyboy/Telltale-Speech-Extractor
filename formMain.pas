@@ -139,6 +139,15 @@ type
     MenuItemOpenPuzzleAgent2: TMenuItem;
     MenuItemHector103: TMenuItem;
     MenuItemHector102: TMenuItem;
+    JurassicParkTheGame1: TMenuItem;
+    MenuItemJurassicPark104: TMenuItem;
+    MenuItemJurassicPark103: TMenuItem;
+    MenuItemJurassicPark102: TMenuItem;
+    MenuItemJurassicPark101: TMenuItem;
+    MenuItemOpenLawAndOrderLegacies: TMenuItem;
+    MenuItemWalkingDeadS1: TMenuItem;
+    MenuItemOpenWalkingDead102: TMenuItem;
+    MenuItemOpenWalkingDead101: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -1246,7 +1255,59 @@ begin
   begin
     strFolder:=GetTelltaleGamePath(Hector_BeyondReasonableDoom);
     strOpenedGame:='Hector - Beyond Reasonable Doom';
+  end
+  else
+  if SenderName = 'MenuItemJurassicPark101' then
+  begin
+    strFolder:=GetTelltaleGamePath(JurassicPark_Ep1);
+    strOpenedGame:='Jurassic Park - Episode 1';
+  end
+  else
+  if SenderName = 'MenuItemJurassicPark102' then
+  begin
+    strFolder:=GetTelltaleGamePath(JurassicPark_Ep2);
+    strOpenedGame:='Jurassic Park - Episode 2';
+  end
+  else
+  if SenderName = 'MenuItemJurassicPark103' then
+  begin
+    strFolder:=GetTelltaleGamePath(JurassicPark_Ep3);
+    strOpenedGame:='Jurassic Park - Episode 3';
+  end
+  else
+  if SenderName = 'MenuItemJurassicPark104' then
+  begin
+    strFolder:=GetTelltaleGamePath(JurassicPark_Ep4);
+    strOpenedGame:='Jurassic Park - Episode 4';
+  end
+  else
+  if SenderName = 'MenuItemOpenLawAndOrderLegacies' then
+  begin
+    strFolder:=GetTelltaleGamePath(LawAndOrder_Legacies);
+    strOpenedGame:='Law And Order: Legacies';
+
+    dlgBrowseForOpenFolder.Directory := strFolder;
+
+    ShowMessage('Law And Order Legacies has the audio for each of its 5 parts stored in separate folders. ' +
+                'You''ll need to load the speech from each part manually.' + #13#13 +
+                'To do this click "Open Folder", scroll down to the "Pack" folder, select one of the folders and click the "Go" button.'
+                + #13#13 +
+                'For example, select the LawAndOrder102 folder to load speech from the first part.');
+
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead101' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_ANewDay);
+    strOpenedGame:='The Walking Dead - A New Day';
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead102' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_StarvedForHelp);
+    strOpenedGame:='The Walking Dead - Starved For Help';
   end;
+
 
   OpenSpeechFolder(strFolder);
 

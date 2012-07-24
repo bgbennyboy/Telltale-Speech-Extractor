@@ -31,7 +31,8 @@ type
   TAudioFormat = (
     AUTOSELECT,
     WAV,
-    OGG
+    OGG,
+    FSB
   );
 
 implementation

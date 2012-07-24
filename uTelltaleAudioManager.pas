@@ -11,8 +11,8 @@ unit uTelltaleAudioManager;
 interface
 
 uses
-  Classes, Sysutils,
-  Speex, Bass, BassEnc, ACS_Misc, JCLStrings,
+  Classes, Sysutils, Windows, Forms,
+  Speex, Bass, BassEnc, ACS_Misc, JCLStrings, fmod, fmodtypes, typinfo,
   uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt;
 
 type
@@ -20,6 +20,7 @@ type
     FT_SPEEX_V1,
     FT_SPEEX_V2,
     FT_OGG,
+    FT_FSB,
     FT_UNKNOWN
   );
 
@@ -36,6 +37,7 @@ type
     function DecodeVOXSpeex(Source, Dest: TStream): boolean;
     function SaveOggToStream(DestStream: TStream): boolean;
     function SaveVoxToStream(AStream: TStream): boolean;
+    function SaveFSBToStream(DestStream: TMemoryStream): boolean;
     function FindFileHeader(SearchStream: TStream; StartSearchAt, EndSearchAt: Integer; Header: string): integer;
     function DecodeToWav(Source: TMemoryStream; Dest: TStream): boolean;
     function EncodeToOgg(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
@@ -198,6 +200,12 @@ begin
 
   SetLength(Header, 4);
   fAudioFile.Read(Header[1], 4);
+
+  if Header='FSB4' then
+  begin
+    fFileType:=FT_FSB;
+    Exit;
+  end;
 
   if Header='ERTM' then
   begin
@@ -562,12 +570,14 @@ begin
       FT_SPEEX_V1: DestFormat := WAV;
       FT_SPEEX_V2: DestFormat := WAV;
       FT_OGG:      DestFormat := OGG;
+      FT_FSB:      DestFormat := WAV;
     end;
   end;
 
   case DestFormat of
     WAV:  FileExt := '.wav';
     OGG:  FileExt := '.ogg';
+    FSB:  FileExt := '.wav';
   end;
 
   DecodeResult := false;
@@ -577,6 +587,7 @@ begin
       FT_SPEEX_V1: DecodeResult := SaveVoxToStream(TempStream);
       FT_SPEEX_V2: DecodeResult := SaveVoxToStream(TempStream);
       FT_OGG:      DecodeResult := SaveOggToStream(TempStream);
+      FT_FSB:      DecodeResult := SaveFSBToStream(TempStream);
     end;
 
     if DecodeResult = false then
@@ -588,7 +599,7 @@ begin
     TempStream.Position := 0;
 
     //This is encoded directly to file without filestream so do this first
-    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) then
+    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_FSB) then
     if (DestFormat = OGG) then
     begin
       //Build a command string for adding the tags when encoding
@@ -616,6 +627,12 @@ begin
         Exit;
       end;
 
+      if (fFileType = FT_FSB) and (DestFormat = WAV) then
+      begin
+        SaveFile.CopyFrom(TempStream, TempStream.Size);
+        Exit;
+      end;
+
       {Now do conversions}
       if (fFileType = FT_OGG) and (DestFormat = WAV) then
       begin
@@ -632,6 +649,141 @@ begin
   finally
     TempStream.Free;
   end;
+end;
+
+function TTelltaleAudioManager.SaveFSBToStream(DestStream: TMemoryStream): boolean;
+var
+  //TempStream: TMemoryStream;
+  SourceData: array of ansichar;
+  FS: pointer;
+  Snd, SubSound: Fmod_Sound;
+  Channel: FMod_Channel;
+  FModResult: FMod_Result;
+  ExInfo: Fmod_CreateSoundExInfo;
+  rate, totalcalls, totaltime: single;
+  Duration, i: cardinal;
+  Played: boolean;
+begin
+  result := false;
+
+  if fAudioFile = nil then exit;
+  DestStream.Position:=0;
+
+
+  FModResult := Fmod_System_Create(fs);
+  try
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on System Create %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+      exit;
+    end;
+
+    Fmod_System_Setoutput( fs, FMOD_OUTPUTTYPE_WAVWRITER_NRT);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on Set Output %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+      exit;
+    end;
+
+    Fmod_System_Init(fs, 32, FMOD_INIT_STREAM_FROM_UPDATE, nil );
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on System Init %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+      exit;
+    end;
+
+    Setlength(SourceData, fAudioFile.Size);
+    fAudioFile.Position := 0;
+    fAudioFile.Read(SourceData[0], fAudioFile.size);
+
+
+    ZeroMemory(@ExInfo, SizeOf(FMOD_CREATESOUNDEXINFO));
+    ExInfo.length := length(SourceData);
+    ExInfo.cbsize := SizeOf(FMOD_CREATESOUNDEXINFO);
+
+    FModResult:=Fmod_System_CreateSound(fs, @SourceData[0], FMOD_CREATESTREAM or FMOD_OPENMEMORY, @ExInfo, Snd);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on CreateSound %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+      exit;
+    end;
+
+    FModResult:= FMOD_Sound_GetSubSound(Snd, 0, SubSound);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on Create SubSound %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+      exit;
+    end;
+
+    Rate := 1024.0 / 44100; //48000.0;
+    Fmod_Sound_GetLength(SubSound, Duration, 1);
+    TotalCalls := (Duration / 1000) / rate;  //div by 1000 to convert to seconds
+    Played:=false;
+    TotalTime :=0;
+
+    for I := 0 to Trunc(totalcalls) - 1 do
+    begin
+      if (Played=false) and (totaltime <= 1000) then
+      begin
+        Fmod_System_Playsound(fs, Fmod_Channel_Free, SubSound, false, Channel); //play just once..in the first second..
+        Played:=true;
+      end;
+
+      Fmod_System_Update(fs);
+      TotalTime := TotalTime + (Rate * 1000);
+    end;
+
+  finally
+    FModResult := fmod_sound_release(SubSound);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on SubSound Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+    end;
+
+    FModResult := fmod_sound_release(Snd);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on Sound Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+    end;
+
+    FModResult := fmod_system_close(fs);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on System Close %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+    end;
+
+    FModResult := fmod_system_release(fs);
+    if FModResult <> FMOD_OK then
+    begin
+      Log(format('Fmod error on System Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
+    end;
+
+    //SetLength(OutputWav, 0);
+    SetLength(SourceData, 0);
+
+    if FModResult = FMOD_OK  then
+    begin
+      //Letting fmod write the files with a different name leads to corruption so this is the slow workaround
+      if FileExists(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav') then
+      begin
+        DestStream.LoadFromFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
+        Result:=true;
+      end;
+      {begin
+        TempStream:=TMemoryStream.Create;
+        try
+          TempStream.LoadFromFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
+          AStream.CopyFrom(TempStream, TempStream.Size);
+          Result:=true;
+        finally
+          TempStream.free;
+        end;
+      end;}
+    end;
+
+    SysUtils.DeleteFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
+  end;
+
 end;
 
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;
@@ -720,6 +872,7 @@ begin
       FT_SPEEX_V1: DecodeResult := SaveVoxToStream(TempStream);
       FT_SPEEX_V2: DecodeResult := SaveVoxToStream(TempStream);
       FT_OGG:      DecodeResult := SaveOggToStream(TempStream);
+      FT_FSB:      DecodeResult := SaveFSBToStream(TempStream);
     end;
 
     if DecodeResult = false then

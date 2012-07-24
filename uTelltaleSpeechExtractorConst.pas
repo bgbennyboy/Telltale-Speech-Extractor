@@ -12,7 +12,7 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.3.6.5';
+  strAppVersion:         string = '1.3.6.6';
   strAppTitle:           string = 'Telltale Speech Extractor';
   strAppURL:             string = 'http://quick.mixnmojo.com';
   
