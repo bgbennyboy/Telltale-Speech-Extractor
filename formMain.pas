@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2011 Bgbennyboy
+  Copyright (c) 2007 - 2013 Bgbennyboy
   Http://quick.mixnmojo.com
 ******************************************************
 }
@@ -148,6 +148,9 @@ type
     MenuItemWalkingDeadS1: TMenuItem;
     MenuItemOpenWalkingDead102: TMenuItem;
     MenuItemOpenWalkingDead101: TMenuItem;
+    MenuItemOpenWalkingDead103: TMenuItem;
+    MenuItemOpenWalkingDead104: TMenuItem;
+    MenuItemOpenWalkingDead105: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -483,6 +486,7 @@ begin
       1: SpeechExtractor.SaveAudioFile(Tree.focusednode.Index, ExtractFilePath(SaveDialog1.FileName), extractfilename(SaveDialog1.FileName), AUTOSELECT);
       2: SpeechExtractor.SaveAudioFile(Tree.focusednode.Index, ExtractFilePath(SaveDialog1.FileName), extractfilename(SaveDialog1.FileName), WAV);
       3: SpeechExtractor.SaveAudioFile(Tree.focusednode.Index, ExtractFilePath(SaveDialog1.FileName), extractfilename(SaveDialog1.FileName), OGG);
+      4: SpeechExtractor.SaveAudioFile(Tree.focusednode.Index, ExtractFilePath(SaveDialog1.FileName), extractfilename(SaveDialog1.FileName), MP3);
     else
       DoLog(strUnknownSaveType);
       exit;
@@ -507,6 +511,7 @@ begin
     200:  Format:=AUTOSELECT;
     201:  Format:=WAV;
     202:  Format:=OGG;
+    203:  Format:=MP3;
   else
     DoLog(strUnknownSaveType);
     Exit;
@@ -1306,8 +1311,28 @@ begin
   begin
     strFolder:=GetTelltaleGamePath(WalkingDead_StarvedForHelp);
     strOpenedGame:='The Walking Dead - Starved For Help';
-  end;
+  end
 
+  else
+  if SenderName = 'MenuItemOpenWalkingDead103' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_LongRoadAhead);
+    strOpenedGame:='The Walking Dead - Long Road Ahead';
+  end
+
+  else
+  if SenderName = 'MenuItemOpenWalkingDead104' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_AroundEveryCorner);
+    strOpenedGame:='The Walking Dead - Around Every Corner';
+  end
+
+  else
+  if SenderName = 'MenuItemOpenWalkingDead105' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_NoTimeLeft);
+    strOpenedGame:='The Walking Dead - No Time Left';
+  end;
 
   OpenSpeechFolder(strFolder);
 

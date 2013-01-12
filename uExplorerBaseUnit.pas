@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2011 Bgbennyboy
+  Copyright (c) 2007 - 2013 Bgbennyboy
   Http://quick.mixnmojo.com
 ******************************************************
 }
@@ -217,8 +217,8 @@ begin
 
     try
       FAudioManager.LoadFile(BundleReader.ActiveFile);
-    except on EInvalidFile do
-      raise;
+    except on E: EInvalidFile do
+      ;//raise;
     end;
 
     //Get the tags
@@ -241,9 +241,6 @@ begin
     //Do the dumping
     FAudioManager.SaveFileAs(DestDir, BundleReader.FileNames[i], SaveAs, strAnnotation, strArtist, strGameTitle, strReleaseYear);
 
-{************************TODO !!!! ID3 Tag Saving!!!!!!!!!!!!!!!****************************************}
-
-
     //Update progress event
     if assigned(FOnProgress) then
     begin
@@ -265,16 +262,22 @@ begin
   begin
     //Change the file to the next one to process
     try
-      BundleReader.ChangeFile(i);
+      BundleReader.ChangeFile(FileIndexes[i]);
     except on E: Exception do
       raise;
+    end;
+
+    try
+      FAudioManager.LoadFile(BundleReader.ActiveFile);
+    except on E: EInvalidFile do
+      ;//raise;
     end;
 
     //Get the tags
     if AnnotationManager <> nil then
     begin
-      strAnnotation  := AnnotationManager.Annotation[i, AfAnnotation];
-      strArtist      := AnnotationManager.Annotation[i, AFCategory];
+      strAnnotation  := AnnotationManager.Annotation[FileIndexes[i], AfAnnotation];
+      strArtist      := AnnotationManager.Annotation[FileIndexes[i], AFCategory];
       strGameTitle   := AnnotationManager.GameTitle;
       strReleaseYear := AnnotationManager.GameReleaseYear;
     end

@@ -3937,7 +3937,6 @@ object frmMain: TfrmMain
       000000000000000000000000000000000000000000000000000000000000}
     DrawSelectionMode = smBlendedRectangle
     Header.AutoSizeIndex = 1
-    Header.DefaultHeight = 17
     Header.Height = 18
     Header.MainColumn = 3
     Header.Options = [hoAutoResize, hoColumnResize, hoDblClickResize, hoDrag, hoHotTrack, hoShowImages, hoVisible, hoAutoSpring]
@@ -6535,7 +6534,7 @@ object frmMain: TfrmMain
   object SaveDialog1: TSaveDialog
     Filter = 
       'Let the program select the most appropriate format|*.*|WAV File|' +
-      '*.wav|OGG File|*.ogg'
+      '*.wav|OGG File|*.ogg|MP3 File|*.mp3'
     FilterIndex = 0
     Options = [ofOverwritePrompt, ofHideReadOnly, ofEnableSizing]
     Left = 464
@@ -18463,7 +18462,8 @@ object frmMain: TfrmMain
     RadioButtons.Strings = (
       'Automatically select the most appropriate format'
       'WAV'
-      'OGG')
+      'OGG'
+      'MP3')
     CommonButtons = [cbCancel]
     DefaultButton = 0
     DefaultRadioButton = 0
@@ -18870,6 +18870,21 @@ object frmMain: TfrmMain
       end
       object MenuItemOpenWalkingDead102: TMenuItem
         Caption = 'The Walking Dead: Starved For Help'
+        ImageIndex = 14
+        OnClick = OpenPopupMenuHandler
+      end
+      object MenuItemOpenWalkingDead103: TMenuItem
+        Caption = 'The Walking Dead: Long Road Ahead'
+        ImageIndex = 14
+        OnClick = OpenPopupMenuHandler
+      end
+      object MenuItemOpenWalkingDead104: TMenuItem
+        Caption = 'The Walking Dead: Around Every Corner'
+        ImageIndex = 14
+        OnClick = OpenPopupMenuHandler
+      end
+      object MenuItemOpenWalkingDead105: TMenuItem
+        Caption = 'The Walking Dead: No Time Left'
         ImageIndex = 14
         OnClick = OpenPopupMenuHandler
       end

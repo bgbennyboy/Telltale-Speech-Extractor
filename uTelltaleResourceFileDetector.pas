@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2011 Bgbennyboy
+  Copyright (c) 2007 - 2013 Bgbennyboy
   Http://quick.mixnmojo.com
 ******************************************************
 }

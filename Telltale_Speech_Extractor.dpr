@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2011 Bgbennyboy
+  Copyright (c) 2007 - 2013 Bgbennyboy
   Http://quick.mixnmojo.com
 ******************************************************
 }
@@ -23,7 +23,10 @@ uses
   uTelltaleAudioManager in 'uTelltaleAudioManager.pas',
   uTelltaleAudioPlayback in 'uTelltaleAudioPlayback.pas',
   uTelltaleResourceFileDetector in 'uTelltaleResourceFileDetector.pas',
-  uTelltaleSpeechExtractorConst in 'uTelltaleSpeechExtractorConst.pas';
+  uTelltaleSpeechExtractorConst in 'uTelltaleSpeechExtractorConst.pas',
+  Mp3FileUtils in 'mp3fileutils_06a\Mp3FileUtils.pas',
+  U_CharCode in 'mp3fileutils_06a\U_CharCode.pas',
+  Id3v2Frames in 'mp3fileutils_06a\Id3v2Frames.pas';
 
 {$R *.res}
 
@@ -39,6 +42,12 @@ begin
   end
   else
   if FileExists(extractfilepath(application.ExeName)+ '\' + 'oggenc.exe') = false then
+  begin
+    ShowMessage('oggenc.exe not found!' + #13 +  'It should be located in the same folder as this program.'
+     + #13 + #13 + 'The program will now exit.');
+  end
+  else
+  if FileExists(extractfilepath(application.ExeName)+ '\' + 'lame.exe') = false then
   begin
     ShowMessage('oggenc.exe not found!' + #13 +  'It should be located in the same folder as this program.'
      + #13 + #13 + 'The program will now exit.');

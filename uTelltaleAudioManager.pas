@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2011 Bgbennyboy
+  Copyright (c) 2007 - 2013 Bgbennyboy
   Http://quick.mixnmojo.com
 ******************************************************
 }
@@ -12,8 +12,9 @@ interface
 
 uses
   Classes, Sysutils, Windows, Forms,
-  Speex, Bass, BassEnc, ACS_Misc, JCLStrings, fmod, fmodtypes, typinfo,
-  uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt;
+  Speex, Bass, BassEnc, MP3FileUtils, JCLStrings, fmod, fmodtypes, typinfo,
+  uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt,
+  uMPEGHeaderCheck, OggVorbisAndOpusTagLibrary;
 
 type
   TAudioFileType = (
@@ -31,7 +32,6 @@ type
     fAudioPlayer: TTelltaleAudioPlayback;
     fOnDebug: TDebugEvent;
     fOnProgress: TProgressEvent;
-    fOggTagEditor: TTagEditor;
     fVoxKeyCheckDone: boolean;
     fEncryptionKey: string;
     function DecodeVOXSpeex(Source, Dest: TStream): boolean;
@@ -41,7 +41,9 @@ type
     function FindFileHeader(SearchStream: TStream; StartSearchAt, EndSearchAt: Integer; Header: string): integer;
     function DecodeToWav(Source: TMemoryStream; Dest: TStream): boolean;
     function EncodeToOgg(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
+    function EncodeToMP3(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
     procedure AddOggTagsToFile(FileName, Title, Artist, Album, Year: string);
+    procedure AddID3V2TagsToMP3(Stream: TStream; Title, Artist, Album, Year: string);
     procedure Log(Text: string);
     procedure ReadHeader;
     procedure GetVOXInfo(Stream: TStream; var NoChannels: integer; var WavSampleRate: integer);
@@ -59,7 +61,8 @@ type
   end;
 
 const
-  strTag_Comments = '-c "Comment=Created with Telltale Speech Extractor. Http://quick.mixnmojo.com" -c "Album Artist=Telltale Games" -c "Genre=Game"';
+  strTag_OGGComments = '-c "Comment=Created with Telltale Speech Extractor. Http://quick.mixnmojo.com" -c "Album Artist=Telltale Games" -c "Genre=Game"';
+  strTag_MP3Comments = 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com';
   EncryptionKeys: array[0..11] of string =(
     '34246C3343726C7564326553576945324F6163396C7574786C3732522D2A384931714F346F616A6C5F24652369616370342A75466C6530', //generic old key
     '92CA9A8185E46473A3BFD6D17FC6CB88995B80D8AAC297E79651A0A89AD9AE95D7766280B4C4A6B9D6ECA99C6885B3DC92C49E64A0A392', //culture shock
@@ -139,7 +142,6 @@ begin
     raise;
   end;
 
-  fOggTagEditor := TTagEditor.Create(nil);
   fVoxKeyCheckDone := false;
 
   if Assigned(fOnDebug) then
@@ -149,7 +151,6 @@ end;
 destructor TTelltaleAudioManager.Destroy;
 begin
   fAudioPlayer.free;
-  fOggTagEditor.Free;
 
   inherited;
 end;
@@ -312,21 +313,74 @@ begin
 
 end;
 
+function TTelltaleAudioManager.EncodeToMP3(Source: TMemoryStream;
+  FileName, TagCommandString: string): boolean;
+var
+  AudioHandle: cardinal;
+  Buf : array [0..10000] of BYTE;
+begin
+  Result := False;
+  if Source.Size = 0 then exit;
+
+  AudioHandle := BASS_StreamCreateFile(True, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
+  try
+    if BASS_Encode_Start(AudioHandle, PChar('lame --preset fast standard ' + TagCommandString + ' - "' + FileName + '"'), BASS_ENCODE_AUTOFREE or BASS_UNICODE {or BASS_ENCODE_FP_32BIT}, nil, nil) <> 0 then
+    try
+      while (BASS_ChannelIsActive(AudioHandle) > 0) do
+      begin
+        BASS_ChannelGetData(AudioHandle, @buf, 10000);
+      end;
+
+      Result := True;
+
+    finally
+      BASS_Encode_Stop(AudioHandle);
+    end;
+
+  finally
+    BASS_StreamFree(AudioHandle);
+  end;
+
+end;
+
+procedure TTelltaleAudioManager.AddID3V2TagsToMP3(Stream: TStream; Title,
+  Artist, Album, Year: string);
+var
+  Tag: TId3v2Tag;
+begin
+  Tag := TId3v2Tag.Create;
+  try
+    Tag.Title    := Title;
+    Tag.Album    := Album;
+    Tag.Artist   := Artist;
+    Tag.Genre    := 'Game';
+    Tag.Year     := Year;
+    Tag.OriginalArtist := 'Telltale Games';
+    Tag.Comment  := 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com';
+    Tag.WriteToStream(Stream);
+  finally
+    Tag.Free;
+  end;
+end;
+
 procedure TTelltaleAudioManager.AddOggTagsToFile(FileName, Title, Artist, Album,
   Year: string);
+var
+  OpusTag: TOpusTag;
 begin
-  fOggTagEditor.FileName := Ansistring(FileName);
-
-  if fOggTagEditor.Valid = false then exit;
-
-  fOggTagEditor.Title    := Title;
-  fOggTagEditor.Album    := Album;
-  fOggTagEditor.Artist   := Artist;
-  fOggTagEditor.Genre    := 'Game';
-  fOggTagEditor.Year     := Year;
-  fOggTagEditor.Comment  := 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com';
-
-  fOggTagEditor.Save;
+  OpusTag := TOpusTag.Create;
+  try
+  OpusTag.SetTextFrameText('TITLE', Title);
+  OpusTag.SetTextFrameText('ALBUM', Album);
+  OpusTag.SetTextFrameText('ARTIST', Artist);
+  OpusTag.SetTextFrameText('GENRE', 'Game');
+  OpusTag.SetTextFrameText('Year', Year);
+  OpusTag.SetTextFrameText('Album Artist', 'Telltale Games');
+  OpusTag.SetTextFrameText('COMMENT', 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com');
+  OpusTag.SaveToFile(FileName);
+  finally
+    OpusTag.Free;
+  end;
 end;
 
 procedure TTelltaleAudioManager.GetVOXInfo(Stream: TStream; var NoChannels: integer; var WavSampleRate: integer);
@@ -557,11 +611,11 @@ procedure TTelltaleAudioManager.SaveFileAs(DestDir, FileName: string;
 var
   TempStream: TMemoryStream;
   SaveFile: TFileStream;
-  DecodeResult, AddOggTags: boolean;
+  DecodeResult, AddOggTagsWhenSaved: boolean;
   FileExt, TagString: string;
 begin
   if fAudioFile = nil then exit;
-  AddOggTags := false;
+  AddOggTagsWhenSaved := false;
 
   //Choose the most suitible output format
   if DestFormat = AUTOSELECT then
@@ -570,14 +624,14 @@ begin
       FT_SPEEX_V1: DestFormat := WAV;
       FT_SPEEX_V2: DestFormat := WAV;
       FT_OGG:      DestFormat := OGG;
-      FT_FSB:      DestFormat := WAV;
+      FT_FSB:      DestFormat := MP3;
     end;
   end;
 
   case DestFormat of
     WAV:  FileExt := '.wav';
     OGG:  FileExt := '.ogg';
-    FSB:  FileExt := '.wav';
+    MP3:  FileExt := '.mp3';
   end;
 
   DecodeResult := false;
@@ -603,9 +657,19 @@ begin
     if (DestFormat = OGG) then
     begin
       //Build a command string for adding the tags when encoding
-      TagString := '-t "' + Tag_Title + '" -a "' + Tag_Artist + '" -l "' + Tag_Album + '" -d "' + Tag_Year + '" ' + strTag_Comments;
+      TagString := '-t "' + Tag_Title + '" -a "' + Tag_Artist + '" -l "' + Tag_Album + '" -d "' + Tag_Year + '" ' + strTag_OGGComments;
 
       EncodeToOgg(TempStream, IncludeTrailingPathDelimiter(DestDir) + ChangeFileExt(Filename, FileExt), TagString);
+      Exit;
+    end;
+
+    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_OGG) then
+    if (DestFormat = MP3) then
+    begin
+      //Build a command string for adding the tags when encoding
+      TagString := '--tt "' + Tag_Title + '" --ta "' + Tag_Artist + '" --tl "' + Tag_Album + '" --ty "' + Tag_Year + '" --tc "' + strTag_MP3Comments + '"';
+
+      EncodeToMP3(TempStream, IncludeTrailingPathDelimiter(DestDir) + ChangeFileExt(Filename, FileExt), TagString);
       Exit;
     end;
 
@@ -616,7 +680,7 @@ begin
       if (fFileType = FT_OGG) and (DestFormat = OGG) then
       begin
         SaveFile.CopyFrom(TempStream, TempStream.Size);
-        AddOggTags := true;
+        AddOggTagsWhenSaved := true;
         Exit;
       end;
 
@@ -627,8 +691,10 @@ begin
         Exit;
       end;
 
-      if (fFileType = FT_FSB) and (DestFormat = WAV) then
+      if (fFileType = FT_FSB) and (DestFormat = MP3) then
       begin
+        AddID3V2TagsToMP3(TempStream, Tag_Title, Tag_Artist, Tag_Album, Tag_Year);
+        TempStream.Position :=0;
         SaveFile.CopyFrom(TempStream, TempStream.Size);
         Exit;
       end;
@@ -640,9 +706,15 @@ begin
         Exit;
       end;
 
+      if (fFileType = FT_FSB) and (DestFormat = WAV) then
+      begin
+        DecodeToWav(TempStream, SaveFile);
+        Exit;
+      end;
+
     finally
       SaveFile.Free;
-      if AddOggTags then
+      if AddOggTagsWhenSaved then
         AddOggTagsToFile( IncludeTrailingPathDelimiter(DestDir) + ChangeFileExt(Filename, FileExt), Tag_Title, Tag_Artist, Tag_Album, Tag_Year);
     end;
 
@@ -653,137 +725,58 @@ end;
 
 function TTelltaleAudioManager.SaveFSBToStream(DestStream: TMemoryStream): boolean;
 var
-  //TempStream: TMemoryStream;
-  SourceData: array of ansichar;
-  FS: pointer;
-  Snd, SubSound: Fmod_Sound;
-  Channel: FMod_Channel;
-  FModResult: FMod_Result;
-  ExInfo: Fmod_CreateSoundExInfo;
-  rate, totalcalls, totaltime: single;
-  Duration, i: cardinal;
-  Played: boolean;
+  TempInt: Integer;
+  buffer: TBuffer;
+  tmpMpegHeader: TMpegHeader;
 begin
-  result := false;
-
+  Result:=false;
   if fAudioFile = nil then exit;
-  DestStream.Position:=0;
 
+  fAudioFile.Position := 0;
+  DestStream.Position := 0;
 
-  FModResult := Fmod_System_Create(fs);
+  fAudioFile.Read(TempInt, 4);
+  if TempInt <> 876761926 then //'FSB4'
+  begin
+    Log( 'Not a FSB4 header!');
+    Exit;
+  end;
+
+  fAudioFile.Read(TempInt, 4);
+  if TempInt <> 1 then //Number of samples
+  begin
+    Log( 'Not just 1 sample in FSB! ' + inttostr(TempInt));
+    Exit;
+  end;
+
+  fAudioFile.Read(TempInt, 4); //Size of sample header
+  fAudioFile.Seek(36 + TempInt, soFromCurrent); //Puts it at start of sample data
+
   try
-    if FModResult <> FMOD_OK then
+    //Now parse the MP3
+    while fAudioFile.Position < fAudioFile.Size do
     begin
-      Log(format('Fmod error on System Create %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-      exit;
-    end;
+      setlength(buffer, 4);
+      TempInt := fAudioFile.Read(buffer[0], 4);  //Bytes read
+      if TempInt < 4 then exit;
 
-    Fmod_System_Setoutput( fs, FMOD_OUTPUTTYPE_WAVWRITER_NRT);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on Set Output %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-      exit;
-    end;
-
-    Fmod_System_Init(fs, 32, FMOD_INIT_STREAM_FROM_UPDATE, nil );
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on System Init %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-      exit;
-    end;
-
-    Setlength(SourceData, fAudioFile.Size);
-    fAudioFile.Position := 0;
-    fAudioFile.Read(SourceData[0], fAudioFile.size);
-
-
-    ZeroMemory(@ExInfo, SizeOf(FMOD_CREATESOUNDEXINFO));
-    ExInfo.length := length(SourceData);
-    ExInfo.cbsize := SizeOf(FMOD_CREATESOUNDEXINFO);
-
-    FModResult:=Fmod_System_CreateSound(fs, @SourceData[0], FMOD_CREATESTREAM or FMOD_OPENMEMORY, @ExInfo, Snd);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on CreateSound %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-      exit;
-    end;
-
-    FModResult:= FMOD_Sound_GetSubSound(Snd, 0, SubSound);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on Create SubSound %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-      exit;
-    end;
-
-    Rate := 1024.0 / 44100; //48000.0;
-    Fmod_Sound_GetLength(SubSound, Duration, 1);
-    TotalCalls := (Duration / 1000) / rate;  //div by 1000 to convert to seconds
-    Played:=false;
-    TotalTime :=0;
-
-    for I := 0 to Trunc(totalcalls) - 1 do
-    begin
-      if (Played=false) and (totaltime <= 1000) then
+      tmpMpegHeader := GetValidatedHeader(buffer, 0);
+      if tmpMpegHeader.valid then
       begin
-        Fmod_System_Playsound(fs, Fmod_Channel_Free, SubSound, false, Channel); //play just once..in the first second..
-        Played:=true;
-      end;
+        fAudioFile.Seek( -4, soFromCurrent);
+        if tmpMpegHeader.framelength + fAudioFile.Position > fAudioFile.Size then
+          exit //Bad frame at the end, dont copy it
+        else
+          DestStream.CopyFrom(fAudioFile, tmpMpegHeader.framelength);
+      end
+      else
+        fAudioFile.Position := fAudioFile.Position -3;
 
-      Fmod_System_Update(fs);
-      TotalTime := TotalTime + (Rate * 1000);
     end;
 
   finally
-    FModResult := fmod_sound_release(SubSound);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on SubSound Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-    end;
-
-    FModResult := fmod_sound_release(Snd);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on Sound Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-    end;
-
-    FModResult := fmod_system_close(fs);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on System Close %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-    end;
-
-    FModResult := fmod_system_release(fs);
-    if FModResult <> FMOD_OK then
-    begin
-      Log(format('Fmod error on System Release %d (%s)', [longint(FModResult), GetEnumName(TypeInfo(FMOD_RESULT), integer(FModResult))]));
-    end;
-
-    //SetLength(OutputWav, 0);
-    SetLength(SourceData, 0);
-
-    if FModResult = FMOD_OK  then
-    begin
-      //Letting fmod write the files with a different name leads to corruption so this is the slow workaround
-      if FileExists(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav') then
-      begin
-        DestStream.LoadFromFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
-        Result:=true;
-      end;
-      {begin
-        TempStream:=TMemoryStream.Create;
-        try
-          TempStream.LoadFromFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
-          AStream.CopyFrom(TempStream, TempStream.Size);
-          Result:=true;
-        finally
-          TempStream.free;
-        end;
-      end;}
-    end;
-
-    SysUtils.DeleteFile(ExtractFilePath(Application.ExeName) + 'fmodoutput.wav');
+    Result := true;
   end;
-
 end;
 
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;

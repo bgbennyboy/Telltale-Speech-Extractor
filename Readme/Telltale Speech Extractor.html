@@ -18,24 +18,28 @@
 		<span class="style10">
 			Telltale Speech Extractor<br>
 			By Bgbennyboy<br>
-			Version 1.3.6.6<br>
+			Version 1.3.6.7<br>
 			<a href="http://quick.mixnmojo.com">Http://quick.mixnmojo.com</a><br><br>
 		</span>
 	</span>
 
-	<p class="style7"><strong><em>New in this version (1.3.6.6):</em></strong></p>
+	<p class="style7"><strong><em>New in this version (1.3.6.7):</em></strong></p>
 	<ul>
-		<li class="style7">Added support for Jurassic Park, Law & Order Legacies and The Walking Dead episodes 1 and 2.</li><br>	
+		<li class="style7">Added support for The Walking Dead episodes 3, 4 and 5.</li><br>
+		<li class="style7">Rewrote support for the FSB audio used in The Walking Dead. The audio is now dumped as it is stored ingame, as MP3s. This also stops the crashes that sometimes occured when saving audio from The Walking Dead. </li><br>	
+		<li class="style7">Fixed bug where 'Save all visible files' did not always work correctly. </li><br>
+		<li class="style7">Added the ability to save audio as MP3. Remember though, that it is better to let the program choose the most appropriate format when saving, this avoids lossy conversion.</li><br>	
+		<li class="style7">Changed the OGG tagging engine. This means that I am able to remove the libtag.dll and libtag_c.dll files - these were sometimes incorrectly detected as a virus by bad antivirus programs.</li><br>		
 	</ul>
 	
-	<p class="style7"><strong><em>New in the previous version (1.3.6.5):</em></strong></p>
+	<p class="style7"><strong><em>New in the previous version (1.3.6.6):</em></strong></p>
 	<ul>
-		<li class="style7">Added support for Puzzle Agent 2, Hector 102  - Senseless Acts of Justice and Hector 103 - Beyond Reasonable Doom.</li><br>	
+		<li class="style7">Added support for Jurassic Park, Law & Order Legacies and The Walking Dead episodes 1 and 2.</li><br>	
 	</ul>
 
 	
 	<p class="style7"><strong><em>What is Telltale Speech Extractor ?:</em></strong><br>
-		A program that enables you to rip the voices and sfx from all games released by Telltale Games. To date (June 2011) that includes:
+		A program that enables you to rip the voices and sfx from all games released by Telltale Games. To date (January 2013) that includes:
 	</p>
 	
 	<ul class="style7">
@@ -110,6 +114,9 @@
 		<ul>	
 		<li>Episode 1: A New Day</li>
 		<li>Episode 2: Starved For Help</li>
+		<li>Episode 3: Long Road Ahead</li>
+		<li>Episode 4: Around Every Corner</li>
+		<li>Episode 5: No Time Left</li>	
 		</ul>			
 		<li>Telltale Texas Hold&rsquo;em</li>
 		<li>Wallace and Gromit&rsquo;s Grand Adventure</li>
@@ -226,13 +233,14 @@
 	<br>
 	<p class="style7"><em><strong>Credits and thanks:</strong></em></p>
 	<ul>
+		<li class="style7">Anders Jakobsen for his help with the FSB files<br>
+			http://aezay.site11.com</li><br>
+			
 		<li class="style7">Annotation Icon from Buff Set by Mattahan<br>
 			http://mattahan.deviantart.com</li><br>
 			
 		<li class="style7">Clear, Add and Undo icons from the TiiconCollection by Timon Freitag<br>
 			http://projects.ff22.de/tiicon/</li><br>
-
-		<li class="style7">Dave - for doing the Delphi 2007 compile<br>
 
 		<li class="style7">Delphi Speex Wrapper by Bech<br>
 			http://www.sed-p.net</li><br>
@@ -249,6 +257,12 @@
 		<li class="style7">JEDI Visual Code Library<br>
 			http://homepages.codegear.com/jedi/jvcl</li><br>
 
+		<li class="style7">MP3FileUtils by Daniel Gaussmann<br>
+			http://www.gausi.de</li><br>
+			
+		<li class="style7">Ogg Vorbis and Opus Tag Library by 3delite<br>
+			http://www.3delite.hu</li><br>
+			
 		<li class="style7">Open icon by Clever Icons<br>
 			http://www.clevericons.com</li><br>
 
@@ -261,14 +275,11 @@
 		<li class="style7">Sam and Max Season One Annotations were fixed, updated and completed by Christoph 'Aeon' Loewe<br>
 			http://aeons.planetquake.gamespy.com</li><br>
 			
-		<li class="style7">Simon Boyes - for advice and testing<br>
+		<li class="style7">Simon Boyes - for advice and testing<br><br>
 
 		<li class="style7">Telltale Games<br>
 			Thanks for making such brilliant games<br>
 			http://www.telltalegames.com</li><br>
-
-		<li class="style7">Vista font fixes by Nathanial Woolls<br>
-			http://www.installationexcellence.com/articles/VistaWithDelphi/</li><br>
 
 		<li class="style7">Virtual Treeview by Mike Lischke<br>
 			http://www.delphi-gems.com</li><br>
@@ -286,6 +297,6 @@
 	</p>
 	
 	<br>
-	<p class="style7 style12">bgbennyboy 24/07/12 </p>
+	<p class="style7 style12">bgbennyboy 04/01/13 </p>
 </body>
 </html>
