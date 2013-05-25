@@ -18690,6 +18690,11 @@ object frmMain: TfrmMain
         ImageIndex = 4
         OnClick = OpenPopupMenuHandler
       end
+      object MenuItemOpenPoker2: TMenuItem
+        Caption = 'Poker Night 2'
+        ImageIndex = 4
+        OnClick = OpenPopupMenuHandler
+      end
     end
     object PuzzleAgent1: TMenuItem
       Caption = 'Puzzle Agent'

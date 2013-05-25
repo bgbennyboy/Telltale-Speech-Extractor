@@ -1,8 +1,8 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bgbennyboy
-  Http://quick.mixnmojo.com
+  Copyright (c) 2007 - 2013 Bennyboy
+  Http://quickandeasysoftware.net
 ******************************************************
 }
 
@@ -151,6 +151,7 @@ type
     MenuItemOpenWalkingDead103: TMenuItem;
     MenuItemOpenWalkingDead104: TMenuItem;
     MenuItemOpenWalkingDead105: TMenuItem;
+    MenuItemOpenPoker2: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -1212,6 +1213,12 @@ begin
   begin
     strFolder:=GetTelltaleGamePath(PokerNight_Inventory) + 'Localized\uncensored_english\';
     strOpenedGame:='Poker Night At The Inventory';
+  end
+  else
+  if SenderName = 'MenuItemOpenPoker2' then
+  begin
+    strFolder:=GetTelltaleGamePath(PokerNight_2);
+    strOpenedGame:='Poker Night 2';
   end
   else
   if SenderName = 'MenuItemOpenBTTF1' then

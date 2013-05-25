@@ -1,8 +1,8 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bgbennyboy
-  Http://quick.mixnmojo.com
+  Copyright (c) 2007 - 2013 Bennyboy
+  Http://quickandeasysoftware.net
 ******************************************************
 }
 
@@ -12,9 +12,9 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.3.6.7';
+  strAppVersion:         string = '1.3.6.8';
   strAppTitle:           string = 'Telltale Speech Extractor';
-  strAppURL:             string = 'http://quick.mixnmojo.com';
+  strAppURL:             string = 'http://quickandeasysoftware.net';
   
 {**********************************Main Form***********************************}
   strNoCategory:            string = 'No category';
