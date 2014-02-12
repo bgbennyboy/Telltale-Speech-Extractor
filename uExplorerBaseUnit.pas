@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bennyboy
+  Copyright (c) 2007 - 2014 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }
@@ -13,7 +13,7 @@ interface
 uses
   classes, forms, windows, sysutils, jclstrings,
   uExplorerTypes, uBaseBundleManager, uBundledManager, uUnbundledManager, uTelltaleResourceFileDetector,
-  uTelltaleAudioManager, uAnnotationManager;
+  uTelltaleAudioManager, uAnnotationManager, uTelltaleFuncs;
 
 type
   TExplorerBaseDumper = class
@@ -31,7 +31,7 @@ type
     function GetAnnotation_AudioLength(Index: integer): string;
     function GetAnnotation_Category(Index: integer): string;
   public
-    constructor Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent);
+    constructor Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame);
     destructor Destroy; override;
     {$ifdef DEBUGMODE}
       function Debug_GenerateVoxInfoString(Index: integer): string;
@@ -58,7 +58,7 @@ type
 implementation
 
 
-constructor TExplorerBaseDumper.Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent);
+constructor TExplorerBaseDumper.Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame);
 var
   ResourceFormat: TAudioResFormat;
   TtarchFileName: string;
@@ -68,7 +68,7 @@ begin
   FAnnotationsFolder:=AnnotationFolder;
 
   //Detect the type of resource files and create the appropriate class
-  ResourceFormat := DetectAudioResources(FSourceFolder, TtarchFileName);
+  ResourceFormat := DetectAudioResources(FSourceFolder, TtarchFileName, TheGame);
   try
     case ResourceFormat of
       UNBUNDLED_VOX: BundleReader := TUnbundledManager.Create(FSourceFolder);

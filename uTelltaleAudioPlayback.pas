@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bennyboy
+  Copyright (c) 2007 - 2014 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }

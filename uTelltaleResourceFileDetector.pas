@@ -1,8 +1,8 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bgbennyboy
-  Http://quick.mixnmojo.com
+  Copyright (c) 2007 - 2014 Bennyboy
+  Http://quickandeasysoftware.net
 ******************************************************
 }
 
@@ -11,7 +11,8 @@ unit uTelltaleResourceFileDetector;
 interface
 
 uses
-  Sysutils, Classes;
+  Sysutils, Classes,
+  uTelltaleFuncs;
 
 type
   TAudioResFormat = (
@@ -20,15 +21,27 @@ type
     NOT_FOUND
   );
 
-  function DetectAudioResources(Folder: string; var TtarchFileName: string): TAudioResFormat;
+  function DetectAudioResources(Folder: string; var TtarchFileName: string; TheGame: TTelltaleGame): TAudioResFormat;
   procedure ListFilesInDirByExt(Path, FileExtension: string; FileList: TStrings);
 
 implementation
 
-function DetectAudioResources(Folder: string; var TtarchFileName: string): TAudioResFormat;
+function DetectAudioResources(Folder: string; var TtarchFileName: string; TheGame: TTelltaleGame): TAudioResFormat;
+const
+  WolfEP1_VoiceBundle = 'Fables_pc_Fables101_ms.ttarch2';
+  WolfEP2_VoiceBundle = 'Fables_pc_Fables102_ms.ttarch2';
+  WolfEP3_VoiceBundle = 'Fables_pc_Fables103_ms.ttarch2';
+  WolfEP4_VoiceBundle = 'Fables_pc_Fables104_ms.ttarch2';
+  WolfEP5_VoiceBundle = 'Fables_pc_Fables105_ms.ttarch2';
+  WalkingDeadS2_EP1_Bundle = 'WalkingDead_pc_WalkingDead201_voice.ttarch2';
+  WalkingDeadS2_EP2_Bundle = 'WalkingDead_pc_WalkingDead202_voice.ttarch2';
+  WalkingDeadS2_EP3_Bundle = 'WalkingDead_pc_WalkingDead203_voice.ttarch2';
+  WalkingDeadS2_EP4_Bundle = 'WalkingDead_pc_WalkingDead204_voice.ttarch2';
+  WalkingDeadS2_EP5_Bundle = 'WalkingDead_pc_WalkingDead205_voice.ttarch2';
 var
   FileNames: TStringList;
   i: integer;
+  BundleFilename: string;
 begin
   Result := NOT_FOUND;
   TtarchFileName := '';
@@ -47,6 +60,41 @@ begin
     begin
       //Check if any file is a speech ttarch from the filename
       if Pos('VOICE', AnsiUpperCase(FileNames.Strings[i])) <> 0 then
+      begin
+        result := TTARCH;
+        TtarchFileName := FileNames.Strings[i];
+        Exit;
+      end
+    end;
+
+{
+  Starting with The Wolf Among Us the bundles are .ttarch2
+  They often have all the bundles in the same folder rather than in separate
+  folders as before. Sometimes they also have a separate music bundle for the
+  menu and one for the episode .That means we need to specifically look for a
+  certain file for later games. For The Wolf AMong Us music and speech seem to be
+  all mixed in the same ttarch2 bundle.
+}
+
+    //For .ttarch2 bundles try and find a specific file - see below
+    case TheGame of
+      WolfAmongUs_Faith:              BundleFileName := WolfEP1_VoiceBundle;
+      WolfAmongUs_SmokeAndMirrors:    BundleFileName := WolfEP2_VoiceBundle;
+      WolfAmongUs_ACrookedMile:       BundleFileName := WolfEP3_VoiceBundle;
+      WolfAmongUs_InSheepsClothing:   BundleFileName := WolfEP4_VoiceBundle;
+      WolfAmongUs_CryWolf:            BundleFileName := WolfEP5_VoiceBundle;
+      WalkingDead_S2_AllThatRemains:  BundleFileName := WalkingDeadS2_EP1_Bundle;
+      WalkingDead_S2_AHouseDivided:   BundleFileName := WalkingDeadS2_EP2_Bundle;
+      WalkingDead_S2_InHarmsWay:      BundleFileName := WalkingDeadS2_EP3_Bundle;
+      WalkingDead_S2_AmidTheRuins:    BundleFileName := WalkingDeadS2_EP4_Bundle;
+      WalkingDead_S2_NoGoingBack:     BundleFileName := WalkingDeadS2_EP5_Bundle;
+    end;
+
+    ListFilesInDirByExt(Folder, '.ttarch2', FileNames);
+    for I := 0 to FileNames.Count - 1 do
+    begin
+      //Check for the specific file
+      if UpperCase(FileNames.Strings[i]) = UpperCase(BundleFileName) then
       begin
         result := TTARCH;
         TtarchFileName := FileNames.Strings[i];

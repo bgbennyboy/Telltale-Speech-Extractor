@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2013 Bennyboy
+  Copyright (c) 2007 - 2014 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }
@@ -145,13 +145,27 @@ type
     MenuItemJurassicPark102: TMenuItem;
     MenuItemJurassicPark101: TMenuItem;
     MenuItemOpenLawAndOrderLegacies: TMenuItem;
-    MenuItemWalkingDeadS1: TMenuItem;
+    MenuItemOpenPoker2: TMenuItem;
+    heWolfAmongUs1: TMenuItem;
+    MenuItemOpenWolfAmongUs105: TMenuItem;
+    MenuItemOpenWolfAmongUs104: TMenuItem;
+    MenuItemOpenWolfAmongUs103: TMenuItem;
+    MenuItemOpenWolfAmongUs102: TMenuItem;
+    MenuItemOpenWolfAmongUs101: TMenuItem;
+    heWalkingDead1: TMenuItem;
+    SeasonTwo1: TMenuItem;
+    MenuItemOpenWalkingDead205: TMenuItem;
+    MenuItemOpenWalkingDead204: TMenuItem;
+    MenuItemOpenWalkingDead203: TMenuItem;
+    MenuItemOpenWalkingDead202: TMenuItem;
+    MenuItemOpenWalkingDead201: TMenuItem;
+    SeasonOne1: TMenuItem;
+    MenuItemOpenWalkingDead106: TMenuItem;
+    MenuItemOpenWalkingDead105: TMenuItem;
+    MenuItemOpenWalkingDead104: TMenuItem;
+    MenuItemOpenWalkingDead103: TMenuItem;
     MenuItemOpenWalkingDead102: TMenuItem;
     MenuItemOpenWalkingDead101: TMenuItem;
-    MenuItemOpenWalkingDead103: TMenuItem;
-    MenuItemOpenWalkingDead104: TMenuItem;
-    MenuItemOpenWalkingDead105: TMenuItem;
-    MenuItemOpenPoker2: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -182,6 +196,7 @@ type
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure OpenPopupMenuHandler(Sender: TObject);
   private
+    fChosenGame: TTelltaleGame;
     SpeechExtractor: TExplorerBaseDumper;
     MyPopUpItems: array of TMenuItem;
     procedure DoLog(logitem: string);
@@ -321,7 +336,7 @@ begin
 
   FreeResources;
   try
-    SpeechExtractor:=TExplorerBaseDumper.Create(IncludeTrailingPathDelimiter(Folder), IncludeTrailingPathDelimiter(GetAnnotationFolder), OnDebug);
+    SpeechExtractor:=TExplorerBaseDumper.Create(IncludeTrailingPathDelimiter(Folder), IncludeTrailingPathDelimiter(GetAnnotationFolder), OnDebug, fChosenGame);
     try
       EnableDisableButtonsGlobal(false);
       SpeechExtractor.OnDebug:=OnDebug;
@@ -938,6 +953,7 @@ var
   SenderName, strFolder, strOpenedGame: string;
 begin
   SenderName := tmenuitem(sender).Name;
+  fChosenGame := UnknownGame; //Only need to know the game for latest games
 
   strFolder:='';
   strOpenedGame:='';
@@ -1319,27 +1335,105 @@ begin
     strFolder:=GetTelltaleGamePath(WalkingDead_StarvedForHelp);
     strOpenedGame:='The Walking Dead - Starved For Help';
   end
-
   else
   if SenderName = 'MenuItemOpenWalkingDead103' then
   begin
     strFolder:=GetTelltaleGamePath(WalkingDead_LongRoadAhead);
     strOpenedGame:='The Walking Dead - Long Road Ahead';
   end
-
   else
   if SenderName = 'MenuItemOpenWalkingDead104' then
   begin
     strFolder:=GetTelltaleGamePath(WalkingDead_AroundEveryCorner);
     strOpenedGame:='The Walking Dead - Around Every Corner';
   end
-
   else
   if SenderName = 'MenuItemOpenWalkingDead105' then
   begin
     strFolder:=GetTelltaleGamePath(WalkingDead_NoTimeLeft);
     strOpenedGame:='The Walking Dead - No Time Left';
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead106' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_400Days);
+    strOpenedGame:='The Walking Dead - 400 Days';
+  end
+
+  else
+  if SenderName = 'MenuItemOpenWalkingDead201' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_S2_AllThatRemains);
+    strOpenedGame:='The Walking Dead S2 - All That Remains';
+    fChosenGame := WalkingDead_S2_AllThatRemains;
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead202' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_S2_AHouseDivided);
+    strOpenedGame:='The Walking Dead S2 - A House Divided';
+    fChosenGame := WalkingDead_S2_AHouseDivided;
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead203' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_S2_InHarmsWay);
+    strOpenedGame:='The Walking Dead S2 - In Harm''s Way';
+    fChosenGame := WalkingDead_S2_InHarmsWay;
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead204' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_S2_AmidTheRuins);
+    strOpenedGame:='The Walking Dead S2 - Amid The Ruins';
+    fChosenGame := WalkingDead_S2_AmidTheRuins;
+  end
+  else
+  if SenderName = 'MenuItemOpenWalkingDead205' then
+  begin
+    strFolder:=GetTelltaleGamePath(WalkingDead_S2_NoGoingBack);
+    strOpenedGame:='The Walking Dead S2 - No Going Back';
+    fChosenGame := WalkingDead_S2_NoGoingBack;
+  end
+  else
+  if SenderName = 'MenuItemOpenWolfAmongUs101' then
+  begin
+    strFolder:=GetTelltaleGamePath(WolfAmongUs_Faith);
+    strOpenedGame:='The Wolf Among Us - Faith';
+    fChosenGame := WolfAmongUs_Faith;
+  end
+  else
+  if SenderName = 'MenuItemOpenWolfAmongUs102' then
+  begin
+    strFolder:=GetTelltaleGamePath(WolfAmongUs_SmokeAndMirrors);
+    strOpenedGame:='The Wolf Among Us - Smoke And Mirrors';
+    fChosenGame := WolfAmongUs_SmokeAndMirrors;
+  end
+  else
+  if SenderName = 'MenuItemOpenWolfAmongUs103' then
+  begin
+    strFolder:=GetTelltaleGamePath(WolfAmongUs_ACrookedMile);
+    strOpenedGame:='The Wolf Among Us - A Crooked Mile';
+    fChosenGame := WolfAmongUs_ACrookedMile;
+  end
+  else
+  if SenderName = 'MenuItemOpenWolfAmongUs104' then
+  begin
+    strFolder:=GetTelltaleGamePath(WolfAmongUs_InSheepsClothing);
+    strOpenedGame:='The Wolf Among Us - In Sheep''s Clothing';
+    fChosenGame := WolfAmongUs_InSheepsClothing;
+  end
+  else
+  if SenderName = 'MenuItemOpenWolfAmongUs105' then
+  begin
+    strFolder:=GetTelltaleGamePath(WolfAmongUs_CryWolf);
+    strOpenedGame:='The Wolf Among Us - Cry Wolf';
+    fChosenGame := WolfAmongUs_CryWolf;
   end;
+
+
+
+
 
   OpenSpeechFolder(strFolder);
 
