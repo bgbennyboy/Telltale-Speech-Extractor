@@ -38,9 +38,10 @@ const
   WalkingDeadS2_EP3_Bundle = 'WalkingDead_pc_WalkingDead203_voice.ttarch2';
   WalkingDeadS2_EP4_Bundle = 'WalkingDead_pc_WalkingDead204_voice.ttarch2';
   WalkingDeadS2_EP5_Bundle = 'WalkingDead_pc_WalkingDead205_voice.ttarch2';
+  //HACK - if add new game - also add it to the SpecificBundleNames list at the bottom
 var
-  FileNames: TStringList;
-  i: integer;
+  FileNames, SpecificBundleNames: TStringList;
+  i, j: integer;
   BundleFilename: string;
 begin
   Result := NOT_FOUND;
@@ -48,6 +49,7 @@ begin
 
   FileNames := TStringList.Create;
   try
+    {************************** Unbundled .vox files **************************}
     ListFilesInDirByExt(Folder, '.vox', FileNames);
     if FileNames.Count > 0 then
     begin
@@ -55,6 +57,7 @@ begin
       Exit;
     end;
 
+    {***************************** Ttarch bundles *****************************}
     ListFilesInDirByExt(Folder, '.ttarch', FileNames);
     for I := 0 to FileNames.Count - 1 do
     begin
@@ -67,16 +70,31 @@ begin
       end
     end;
 
-{
-  Starting with The Wolf Among Us the bundles are .ttarch2
-  They often have all the bundles in the same folder rather than in separate
-  folders as before. Sometimes they also have a separate music bundle for the
-  menu and one for the episode .That means we need to specifically look for a
-  certain file for later games. For The Wolf AMong Us music and speech seem to be
-  all mixed in the same ttarch2 bundle.
-}
+    {****************** Uncensored Ttarch from Poker night 1 ******************}
+    for I := 0 to FileNames.Count - 1 do
+    begin
+      //Check for the uncensored ttarch from Poker Night At The Inventory
+      if Pos('UNCENSORED', AnsiUpperCase(FileNames.Strings[i])) <> 0 then
+      begin
+        result := TTARCH;
+        TtarchFileName := FileNames.Strings[i];
+        Exit;
+      end
+    end;
 
-    //For .ttarch2 bundles try and find a specific file - see below
+
+    {**************************** Ttarch2 bundles *****************************}
+
+    {
+    Starting with The Wolf Among Us the bundles are .ttarch2
+    They often have all the bundles in the same folder rather than in separate
+    folders as before. Sometimes they also have a separate music bundle for the
+    menu and one for the episode .That means we need to specifically look for a
+    certain file for later games. For The Wolf Among Us music and speech seem to be
+    all mixed in the same ttarch2 bundle.
+    }
+
+    //For .ttarch2 bundles try and find a specific file
     case TheGame of
       WolfAmongUs_Faith:              BundleFileName := WolfEP1_VoiceBundle;
       WolfAmongUs_SmokeAndMirrors:    BundleFileName := WolfEP2_VoiceBundle;
@@ -102,15 +120,45 @@ begin
       end
     end;
 
-    for I := 0 to FileNames.Count - 1 do
-    begin
-      //Check for the uncensored ttarch from Poker Night At The Inventory
-      if Pos('UNCENSORED', AnsiUpperCase(FileNames.Strings[i])) <> 0 then
+    {**** Ttarch2 bundles if they've used open folder and no game specified****}
+    {
+    Edge case - they've used 'open folder' to manually choose a game. They've
+    chosen a folder with one of the new .ttarch2 games in it - so we dont know
+    what specific episode they actually want from that folder.
+    Hack for now - just choose the first recognised bundle in that folder
+    THIS IS AN AWFUL HACK - FIX THIS
+    Having to remember to add new constants to the stringlist below is particularly bad
+    }
+    SpecificBundleNames := TStringList.Create;
+    try
+      SpecificBundleNames.Add(WolfEP1_VoiceBundle);
+      SpecificBundleNames.Add(WolfEP2_VoiceBundle);
+      SpecificBundleNames.Add(WolfEP3_VoiceBundle);
+      SpecificBundleNames.Add(WolfEP4_VoiceBundle);
+      SpecificBundleNames.Add(WolfEP5_VoiceBundle);
+      SpecificBundleNames.Add(WalkingDeadS2_EP1_Bundle);
+      SpecificBundleNames.Add(WalkingDeadS2_EP2_Bundle);
+      SpecificBundleNames.Add(WalkingDeadS2_EP3_Bundle);
+      SpecificBundleNames.Add(WalkingDeadS2_EP4_Bundle);
+      SpecificBundleNames.Add(WalkingDeadS2_EP5_Bundle);
+
+      for j := 0 to SpecificBundleNames.Count - 1 do
       begin
-        result := TTARCH;
-        TtarchFileName := FileNames.Strings[i];
-        Exit;
-      end
+        ListFilesInDirByExt(Folder, '.ttarch2', FileNames);
+        for I := 0 to FileNames.Count - 1 do
+        begin
+          //Check for the specific file
+          if UpperCase(FileNames.Strings[i]) = UpperCase(SpecificBundleNames[j]) then
+          begin
+            result := TTARCH;
+            TtarchFileName := FileNames.Strings[i];
+            Exit;
+          end
+        end;
+      end;
+
+    finally
+      SpecificBundleNames.Free;
     end;
 
   finally
