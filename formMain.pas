@@ -31,12 +31,12 @@ interface
 
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
-  Dialogs, StdCtrls, ImgList, ComCtrls, ExtCtrls, Menus, XPMan,
+  Dialogs, StdCtrls, ImgList, ComCtrls, ExtCtrls, Menus,
 
   JvMenus, JvBaseDlg, JvBrowseFolder, JvExStdCtrls, JvRichEdit, JvExExtCtrls,
   JvExtComponent, JvPanel, JvEdit, JvHtControls,
 
-  VirtualTrees, PngImageList,
+  VirtualTrees,
 
   jclfileutils, jclsysinfo, jclstrings, jclshell,
 
@@ -55,7 +55,6 @@ type
     btnSaveSingleAudio: TAdvGlowButton;
     btnSaveAllAudio: TAdvGlowButton;
     btnPlaySound: TAdvGlowButton;
-    PngImageList1: TPngImageList;
     dlgBrowseForOpenFolder: TJvBrowseForFolderDialog;
     AdvMenuOfficeStyler1: TAdvMenuOfficeStyler;
     btnFilterView: TAdvGlowButton;
@@ -166,6 +165,7 @@ type
     MenuItemOpenWalkingDead103: TMenuItem;
     MenuItemOpenWalkingDead102: TMenuItem;
     MenuItemOpenWalkingDead101: TMenuItem;
+    ImageList1: TImageList;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
@@ -788,6 +788,9 @@ procedure TfrmMain.TreeGetImageIndex(Sender: TBaseVirtualTree;
   Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
   var Ghosted: Boolean; var ImageIndex: Integer);
 begin
+  if column <> 0 then exit;
+  if Kind = ikOverlay then exit;
+
   if column=0 then
     ImageIndex:=5;
 end;

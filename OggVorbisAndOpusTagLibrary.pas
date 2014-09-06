@@ -1,17 +1,21 @@
 //********************************************************************************************************************************
 //*                                                                                                                              *
-//*     Ogg Vorbis and Opus Tag Library 1.0.5.11 © 3delite 2012                                                                  *
+//*     Ogg Vorbis and Opus Tag Library 1.0.14.21 © 3delite 2012-2014                                                            *
 //*     See Ogg Vorbis and Opus Tag Library Readme.txt for details                                                               *
 //*                                                                                                                              *
 //* Two licenses are available for commercial usage of this component:                                                           *
-//* Shareware License: 50 Euros                                                                                                  *
-//* Commercial License: 250 Euros                                                                                                *
+//* Shareware License: €50                                                                                                       *
+//* Commercial License: €250                                                                                                     *
 //*                                                                                                                              *
 //*     http://www.shareit.com/product.html?productid=300552311                                                                  *
 //*                                                                                                                              *
 //* Using the component in free programs is free.                                                                                *
 //*                                                                                                                              *
 //*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/OpusTagLibrary.html                                        *
+//*                                                                                                                              *
+//* This component is also available as a part of Tags Library:                                                                  *
+//*                                                                                                                              *
+//*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/TagsLibrary.html                                           *
 //*                                                                                                                              *
 //* There is also an ID3v2 Library available at:                                                                                 *
 //*                                                                                                                              *
@@ -25,6 +29,18 @@
 //*                                                                                                                              *
 //*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/MP4TagLibrary.html                                         *
 //*                                                                                                                              *
+//* a Flac Tag Library available at:                                                                                             *
+//*                                                                                                                              *
+//*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/FlacTagLibrary.html                                        *
+//*                                                                                                                              *
+//* an WMA Tag Library available at:                                                                                             *
+//*                                                                                                                              *
+//*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/WMATagLibrary.html                                         *
+//*                                                                                                                              *
+//* a WAV Tag Library available at:                                                                                              *
+//*                                                                                                                              *
+//*     http://www.3delite.hu/Object%20Pascal%20Developer%20Resources/WAVTagLibrary.html                                         *
+//*                                                                                                                              *
 //* For other Delphi components see the home page:                                                                               *
 //*                                                                                                                              *
 //*     http://www.3delite.hu/                                                                                                   *
@@ -37,15 +53,22 @@
 
 unit OggVorbisAndOpusTagLibrary;
 
-{$Optimization On}
+{$IFDEF IOS}
+    {$DEFINE OVAOTL_MOBILE}
+{$ENDIF}
+
+{$IFDEF ANDROID}
+    {$DEFINE OVAOTL_MOBILE}
+{$ENDIF}
 
 interface
 
 Uses
+    SysUtils,
     Classes;
 
 Const
-    OPUSTAGLIBRARY_VERSION = $01000511;
+    OPUSTAGLIBRARY_VERSION = $01001421;
 
 Const
     OPUSTAGLIBRARY_SUCCESS                              = 0;
@@ -74,12 +97,16 @@ Const
     VORBIS_TAG_ID = #3 + 'vorbis';
 
 Const
-    OGG_PAGE_SEGMENT_SIZE = 17;
+    OGG_PAGE_SEGMENT_SIZE           = 17;
+    DEFAULT_WRITE_PADDING           = False;
+    DEFAULT_PADDING_SIZE            = 2048;
+    DEFAULT_UPPERCASE_FIELD_NAMES   = True;
+    DEFAULT_PARSE_PLAYTIME          = False;
 
 type
     // Ogg page header
     TOggHeader = packed record
-        ID: array [1..4] of AnsiChar;                             { Always "OggS" }
+        ID: array [1..4] of Byte;                                 { Always "OggS" }
         StreamVersion: Byte;                           { Stream structure version }
         TypeFlag: Byte;                                        { Header type flag }
         AbsolutePosition: Int64;                      { Absolute granule position }
@@ -92,7 +119,7 @@ type
 
     // Opus parameter header
     TOpusHeader = packed record
-        ID: array [1..8] of AnsiChar;                         { Always "OpusHead" }
+        ID: array [1..8] of Byte;                         { Always "OpusHead" }
         BitstreamVersion: Byte;                        { Bitstream version number }
         ChannelCount: Byte;                                  { Number of channels }
         PreSkip: Word;
@@ -103,13 +130,13 @@ type
 
     // Opus tag data
     TOpusTags = record
-        ID: array [1..8] of AnsiChar;                         { Always "OpusTags" }
+        ID: array [1..8] of Byte;                         { Always "OpusTags" }
         Fields: Integer;                                   { Number of tag fields }
      end;
 
     // Vorbis parameter header
     TVorbisHeader = packed record
-        ID: array [1..7] of AnsiChar;                      { Always #1 + "vorbis" }
+        ID: array [1..7] of Byte;                      { Always #1 + "vorbis" }
         BitstreamVersion: array [1..4] of Byte;        { Bitstream version number }
         ChannelMode: Byte;                                   { Number of channels }
         SampleRate: Integer;                                   { Sample rate (hz) }
@@ -122,7 +149,7 @@ type
 
     { Vorbis tag data }
     TVorbisTag = record
-        ID: array [1..7] of AnsiChar;                      { Always #3 + "vorbis" }
+        ID: array [1..7] of Byte;                      { Always #3 + "vorbis" }
         Fields: Integer;                                   { Number of tag fields }
     end;
 
@@ -141,6 +168,10 @@ type
         TagEndPos: Integer;                                    { Tag end position }
         TagCount: Integer;
         DataPageNumberStartsFrom: Int64;
+        HeaderOggPageCount: Int64;
+        SampleCount: Int64;
+        PlayTime: Double;
+        BitRate: Integer;
     end;
 
 type
@@ -165,19 +196,33 @@ type
 type
     TOggFormat = (ofUnknown, ofVorbis, ofOpus);
 
+type
+    TOpusVorbisCoverArtInfo = record
+        PictureType: Cardinal;
+        MIMEType: String;
+        Description: String;
+        Width: Cardinal;
+        Height: Cardinal;
+        ColorDepth: Cardinal;
+        NoOfColors: Cardinal;
+        SizeOfPictureData: Cardinal;
+    end;
 
 type
     TOpusTagFrameFormat = (otffUnknown, otffText, otffCoverArt, otffBinary);
 
 type
+    TOpusTag = class;
+
     TOpusTagFrame = class
     private
     public
-        Name: AnsiString;
+        Name: String;
         Format: TOpusTagFrameFormat;
         Stream: TMemoryStream;
         Index: Integer;
-        Constructor Create;
+        Parent: TOpusTag;
+        Constructor Create(Parent: TOpusTag);
         Destructor Destroy; override;
         function GetAsText: String;
         function SetAsText(Text: String): Boolean;
@@ -189,9 +234,12 @@ type
         function CalculateTotalFrameSize: Integer;
     end;
 
-type
     TOpusTag = class
     private
+        procedure ReadOpusAudioAttributes(Stream: TStream);
+        procedure ReadVorbisAudioAttributes(Stream: TStream);
+        function GetSamples(const Source: TStream): Int64;
+        function GetPlayTime: Double;
     public
         FileName: String;
         Loaded: Boolean;
@@ -200,7 +248,9 @@ type
         VendorString: String;
         FirstOGGPage: TMemoryStream;
         WritePadding: Boolean;
-        PaddingSize: Cardinal;
+        PaddingSizeToWrite: Integer;
+        UpperCaseFieldNamesToWrite: Boolean;
+        ParsePlayTime: Boolean;
         Format: TOggFormat;
         VorbisData: TMemoryStream;
         Constructor Create;
@@ -213,13 +263,15 @@ type
         function AddFrame(Name: String): TOpusTagFrame;
         function DeleteFrame(FrameIndex: Integer): Boolean;
         procedure DeleteAllFrames;
+        procedure DeleteAllCoverArts;
         procedure Clear;
         function Count: Integer;
-        function FrameExists(Name: AnsiString): Integer; overload;
+        function CoverArtCount: Integer;
+        function FrameExists(Name: String): Integer; overload;
         function FrameTypeCount(Name: String): Integer;
         function CalculateTotalFramesSize: Integer;
         function CalculateTagSize(IncludePadding: Boolean): Integer;
-        procedure AddTextFrame(Name: String; Text: String);
+        function AddTextFrame(Name: String; Text: String): Integer;
         function AddBinaryFrame(Name: String; BinaryStream: TStream): Boolean;
         function SetBinaryFrame(FrameIndex: Integer; BinaryStream: TStream): Boolean;
         procedure SetTextFrameText(Name: String; Text: String);
@@ -229,19 +281,22 @@ type
         function ReadBinaryFrame(FrameIndex: Integer; BinaryStream: TStream): Boolean; overload;
         function ReadBinaryFrame(Name: String; BinaryStream: TStream): Boolean; overload;
         procedure RemoveEmptyFrames;
-        function AddPictureFrame(PictureStream: TStream; PictureType: Cardinal; MIMEType: AnsiString; Description: String; Width: Cardinal; Height: Cardinal; ColorDepth: Cardinal; NoOfColors: Cardinal): Boolean;
-        function SetPictureFrame(Index: Integer; PictureStream: TStream; PictureType: Cardinal; MIMEType: AnsiString; Description: String; Width: Cardinal; Height: Cardinal; ColorDepth: Cardinal; NoOfColors: Cardinal): Boolean;
-        function GetPictureFromFrame(Index: Integer; var PictureStream: TStream; var PictureType: Cardinal; var MIMEType: AnsiString; var Description: String; var Width: Cardinal; var Height: Cardinal; var ColorDepth: Cardinal; var NoOfColors: Cardinal): Boolean;
+        function AddCoverArtFrame(PictureStream: TStream; CoverArtInfo: TOpusVorbisCoverArtInfo): Integer;
+        function SetCoverArtFrame(Index: Integer; PictureStream: TStream; CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
+        function GetCoverArtFromFrame(Index: Integer; var PictureStream: TStream; var CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
+        function GetCoverArtInfo(Index: Integer; var CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
         function DeleteFrameByName(Name: String): Boolean;
         function Assign(Source: TOpusTag): Boolean;
-        procedure SetTagItem(const Data: AnsiString; DataStream: TMemoryStream);
+        procedure SetTagItem(const Data: String; DataStream: TMemoryStream);
         procedure ReadTag(const Source: TStream; OGGStream: TOGGStream);
         function GetInfo(SourceFile: TStream): Boolean;
         function BuildTag(var Stream: TMemoryStream; PaddingSize: Cardinal): Boolean;
-        function AdjustPadding(TagSize: Cardinal): Boolean;
+        function AdjustPadding(TagSize: Integer): Boolean;
     end;
 
     function RemoveOpusTagFromFile(FileName: String): Integer;
+
+    function OpusTagErrorCode2String(ErrorCode: Integer): String;
 
     function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean): Integer;
 
@@ -300,13 +355,8 @@ Const
     $933EB0BB, $97FFAD0C, $AFB010B1, $AB710D06, $A6322BDF, $A2F33668,
     $BCB4666D, $B8757BDA, $B5365D03, $B1F740B4);
 
-const
-    EncodeTable: array[0..63] of AnsiChar =
-        AnsiString('ABCDEFGHIJKLMNOPQRSTUVWXYZ') +
-        AnsiString('abcdefghijklmnopqrstuvwxyz') +
-        AnsiString('0123456789+/');
-
-    DecodeTable: array[#0..#127] of Integer = (
+Const
+    DecodeTable: array[0..127] of Integer = (
         Byte('='), 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
             64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64,
             64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 64, 62, 64, 64, 64, 63,
@@ -316,6 +366,9 @@ const
             64, 26, 27, 28, 29, 30, 31, 32, 33, 34, 35, 36, 37, 38, 39, 40,
             41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 64, 64, 64, 64, 64);
 
+var
+    EncodeTable: array[0..63] of Byte;
+
 type
     PPacket = ^TPacket;
     TPacket = packed record
@@ -323,44 +376,136 @@ type
             0: (b0, b1, b2, b3: Byte);
             1: (i: Integer);
             2: (a: array[0..3] of Byte);
-            3: (c: array[0..3] of AnsiChar);
+            3: (c: array[0..3] of Byte);
         end;
 
 var
-    OpusTagLibraryWritePadding: Boolean = False;
-    OpusTagLibraryPaddingSize: Cardinal = 2048;
+    OpusTagLibraryWritePadding: Boolean = DEFAULT_WRITE_PADDING;
+    OpusTagLibraryPaddingSize: Cardinal = DEFAULT_PADDING_SIZE;
+    OpusTagLibraryDefaultUpperCaseFieldNamesToWrite: Boolean = DEFAULT_UPPERCASE_FIELD_NAMES;
+    OpusTagLibraryDefaultParsePlayTime: Boolean = DEFAULT_PARSE_PLAYTIME;
 
 implementation
 
-Uses
     {$IFDEF MSWINDOWS}
-    Windows,
+Uses
+    Windows;
     {$ENDIF}
-    SysUtils;
+    {$IFDEF POSIX}
+Uses
+    Posix.UniStd,
+    Posix.StdIO;
+    {$ENDIF}
 
-procedure EncodePacket(const Packet: TPacket; NumChars: Integer; OutBuf: PAnsiChar);
+function Bytes2MB(Bytes: Int64): String;
+var
+    KB: Extended;
+    MB: Extended;
+    GB: Extended;
+    TB: Extended;
+    PB: Extended;
+    EB: Extended;
+    ZB: Extended;
+    YB: Extended;
+    KBD: Extended;
+    MBD: Extended;
+    GBD: Extended;
+    TBD: Extended;
+    PBD: Extended;
+    EBD: Extended;
+    ZBD: Extended;
+    YBD: Extended;
+begin
+    {
+    if Bytes > 1048576 then begin
+        if Bytes > 1073741824
+            then Result := FloatToStrF((Bytes / 1073741824), ffFixed, 4, 2) + ' GB'
+            else Result := FloatToStrF((Bytes / 1048576), ffFixed, 4, 2) + ' MB';
+    end else Result := FloatToStrF((Bytes / 1024), ffFixed, 4, 2) + ' KB';
+    if Bytes < 1024
+ 	    then Result := IntToStr(Bytes) + ' Byte';
+    }
+
+    KB := 1024.0 * 1024.0;
+    MB := 1024.0 * 1024.0 * 1024.0;
+    GB := 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    TB := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    PB := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    EB := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    ZB := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    YB := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+
+    KBD := 1024.0;
+    MBD := 1024.0 * 1024.0;
+    GBD := 1024.0 * 1024.0 * 1024.0;
+    TBD := 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    PBD := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    EBD := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    ZBD := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+    YBD := 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0 * 1024.0;
+
+    if Bytes < 1024 then begin
+        Result := IntToStr(Bytes) + ' Byte';
+    end else begin
+        if Bytes < KB then begin
+            Result := FloatToStrF((Bytes / KBD), ffFixed, 4, 2) + ' KB';
+        end else begin
+            if Bytes < MB then begin
+                Result := FloatToStrF((Bytes / MBD), ffFixed, 4, 2) + ' MB';
+            end else begin
+                if Bytes < GB then begin
+                    Result := FloatToStrF((Bytes / GBD), ffFixed, 4, 2) + ' GB'
+                end else begin
+                    if Bytes < TB then begin
+                        Result := FloatToStrF((Bytes / TBD), ffFixed, 4, 2) + ' TB'
+                    end else begin
+                        if Bytes < PB then begin
+                            Result := FloatToStrF((Bytes / PBD), ffFixed, 4, 2) + ' PB'
+                        end else begin
+                            if Bytes < EB then begin
+                                Result := FloatToStrF((Bytes / EBD), ffFixed, 4, 2) + ' EB'
+                            end else begin
+                                if Bytes < ZB then begin
+                                    Result := FloatToStrF((Bytes / ZBD), ffFixed, 4, 2) + ' ZB'
+                                end else begin
+                                    if Bytes < YB then begin
+                                        Result := FloatToStrF((Bytes / YBD), ffFixed, 4, 2) + ' YB'
+                                    end else begin
+                                        Result := FloatToStrF((Bytes / YBD), ffFixed, 4, 2) + ' YB'
+                                    end;
+                                end;
+                            end;
+                        end;
+                    end;
+                end;
+            end;
+        end;
+    end;
+end;
+
+procedure EncodePacket(const Packet: TPacket; NumChars: Integer; OutBuf: PByte);
 begin
   OutBuf[0] := EnCodeTable[Packet.a[0] shr 2];
   OutBuf[1] := EnCodeTable[((Packet.a[0] shl 4) or (Packet.a[1] shr 4)) and $0000003f];
   if NumChars < 2 then
-    OutBuf[2] := '='
+    OutBuf[2] := Ord('=')
   else OutBuf[2] := EnCodeTable[((Packet.a[1] shl 2) or (Packet.a[2] shr 6)) and $0000003f];
   if NumChars < 3 then
-    OutBuf[3] := '='
+    OutBuf[3] := Ord('=')
   else OutBuf[3] := EnCodeTable[Packet.a[2] and $0000003f];
 end;
 
-function DecodePacket(InBuf: PAnsiChar; var nChars: Integer): TPacket;
+function DecodePacket(InBuf: PByte; var nChars: Integer): TPacket;
 begin
   Result.a[0] := (DecodeTable[InBuf[0]] shl 2) or
     (DecodeTable[InBuf[1]] shr 4);
   NChars := 1;
-  if InBuf[2] <> '=' then
+  if InBuf[2] <> Ord('=') then
   begin
     Inc(NChars);
     Result.a[1] := Byte((DecodeTable[InBuf[1]] shl 4) or (DecodeTable[InBuf[2]] shr 2));
   end;
-  if InBuf[3] <> '=' then
+  if InBuf[3] <> Ord('=') then
   begin
     Inc(NChars);
     Result.a[2] := Byte((DecodeTable[InBuf[2]] shl 6) or DecodeTable[InBuf[3]]);
@@ -372,16 +517,16 @@ type
   PInteger = ^Integer;
 var
   InBuf: array[0..509] of Byte;
-  OutBuf: array[0..1023] of AnsiChar;
-  BufPtr: PAnsiChar;
-  I, J, K, BytesRead: Integer;
+  OutBuf: array[0..1023] of Byte;
+  BufPtr: PByte;
+  I, J, {K,} BytesRead: Integer;
   Packet: TPacket;
 begin
-  K := 0;
+  //K := 0;
   repeat
     BytesRead := Input.Read(InBuf, SizeOf(InBuf));
     I := 0;
-    BufPtr := OutBuf;
+    BufPtr := @OutBuf[0];
     while I < BytesRead do
     begin
       if BytesRead - I < 3 then
@@ -396,7 +541,7 @@ begin
       EncodePacket(Packet, J, BufPtr);
       Inc(I, 3);
       Inc(BufPtr, 4);
-      Inc(K, 4);
+      //Inc(K, 4);
     end;
     Output.Write(Outbuf, BufPtr - PChar(@OutBuf));
   until BytesRead = 0;
@@ -404,19 +549,20 @@ end;
 
 procedure DecodeStream(Input, Output: TStream);
 var
-  InBuf: array[0..75] of AnsiChar;
+  InBuf: array[0..75] of Byte;
   OutBuf: array[0..60] of Byte;
-  InBufPtr, OutBufPtr: PAnsiChar;
+  InBufPtr, OutBufPtr: PByte;
   I, J, K, BytesRead: Integer;
   Packet: TPacket;
 
   procedure SkipWhite;
   var
-    C: AnsiChar;
+    C: Char;
     NumRead: Integer;
   begin
     while True do
     begin
+      FillChar(C, SizeOf(C), 0);
       NumRead := Input.Read(C, 1);
       if NumRead = 1 then
       begin
@@ -443,7 +589,7 @@ var
       IdxEnd := CntRead + IdxEnd;
       while (Idx < IdxEnd) do
       begin
-        if not (InBuf[Idx] in ['0'..'9','A'..'Z','a'..'z','+','/','=']) then
+        if not (Char(InBuf[Idx]) in ['0'..'9','A'..'Z','a'..'z','+','/','=']) then
         begin
           Dec(IdxEnd);
           if Idx < IdxEnd then
@@ -461,7 +607,7 @@ begin
   repeat
     SkipWhite;
     BytesRead := ReadInput;
-    InBufPtr := InBuf;
+    InBufPtr := @InBuf[0];
     OutBufPtr := @OutBuf;
     I := 0;
     while I < BytesRead do
@@ -470,7 +616,7 @@ begin
       K := 0;
       while J > 0 do
       begin
-        OutBufPtr^ := AnsiChar(Packet.a[K]);
+        OutBufPtr^ := Byte(Packet.a[K]);
         Inc(OutBufPtr);
         Dec(J);
         Inc(K);
@@ -478,7 +624,7 @@ begin
       Inc(InBufPtr, 4);
       Inc(I, 4);
     end;
-    Output.Write(OutBuf, OutBufPtr - PAnsiChar(@OutBuf));
+    Output.Write(OutBuf, OutBufPtr - PByte(@OutBuf));
   until BytesRead = 0;
 end;
 
@@ -798,7 +944,6 @@ function TOGGStream.CalculateWrappedStreamSize(InputDataSize: Integer): Integer;
 var
     Header: TOggHeader;
     DataSize: Integer;
-    i: Integer;
     DataLeft: Integer;
 begin
     try
@@ -830,9 +975,8 @@ function TOGGStream.CalculateWrappedStreamSizeVorbis(TagSize: Integer; InputData
 var
     Header: TOggHeader;
     DataSize: Integer;
-    i: Integer;
     DataLeft: Integer;
-    TagSegments: Integer;
+    //TagSegments: Integer;
     TagDataSize: Integer;
 begin
     try
@@ -853,7 +997,7 @@ begin
                     end else begin
                         Header.Segments := (DataSize div $FF) + 1;
                     end;
-                    TagSegments := Header.Segments;
+                    //TagSegments := Header.Segments;
                     TagDataSize := DataSize;
 
                     DataSize := DataLeft;
@@ -914,7 +1058,6 @@ function TOGGStream.CalculateWrappedStreamSizeEx(InputDataSize: Integer; MustFit
 var
     Header: TOggHeader;
     DataSize: Integer;
-    i: Integer;
     DataLeft: Integer;
 begin
     try
@@ -954,7 +1097,6 @@ var
     PageCounter: Int64;
 begin
     try
-        Result := False;
         FillChar(Header, SizeOf(TOggHeader), 0);
         PageCounter := PageNumberStartsFrom;
         OGGPage := TMemoryStream.Create;
@@ -984,9 +1126,10 @@ begin
     end;
 end;
 
-Constructor TOpusTagFrame.Create;
+Constructor TOpusTagFrame.Create(Parent: TOpusTag);
 begin
-    Inherited;
+    Inherited Create;
+    Self.Parent := Parent;
     Name := '';
     Stream := TMemoryStream.Create;
     Format := otffUnknown;
@@ -1002,29 +1145,37 @@ function TOpusTagFrame.GetAsText: String;
 var
     i: Integer;
     Data: Byte;
-    AnsiStr: AnsiString;
+    Bytes: TBytes;
 begin
     Result := '';
+    if Format = otffCoverArt then begin
+        Result := 'COVER ART BINARY ' + Bytes2MB(Stream.Size);
+        Exit;
+    end;
+    if Format = otffBinary then begin
+        Result := 'BINARY ' + Bytes2MB(Stream.Size);
+        Exit;
+    end;
     if Format <> otffText then begin
         Exit;
     end;
     Stream.Seek(0, soBeginning);
+    SetLength(Bytes, Stream.Size);
     for i := 0 to Stream.Size - 1 do begin
         Stream.Read(Data, 1);
-        AnsiStr := AnsiStr + AnsiChar(Data);
+        Bytes[i] := Data;
     end;
     Stream.Seek(0, soBeginning);
-    Result := UTF8Decode(AnsiStr);
+    Result := TEncoding.UTF8.GetString(Bytes);
 end;
 
 function TOpusTagFrame.SetAsText(Text: String): Boolean;
 var
-    AnsiStr: AnsiString;
+    Bytes: TBytes;
 begin
-    Result := False;
-    AnsiStr := UTF8Encode(Text);
+    Bytes := TEncoding.UTF8.GetBytes(Text);
     Stream.Clear;
-    Stream.Write(Pointer(AnsiStr)^, Length(AnsiStr));
+    Stream.Write(Bytes[0], Length(Bytes));
     Stream.Seek(0, soBeginning);
     Format := otffText;
     Result := True;
@@ -1034,20 +1185,19 @@ function TOpusTagFrame.SetAsList(List: TStrings): Boolean;
 var
     i: Integer;
     Data: Byte;
-    Name: AnsiString;
-    Value: AnsiString;
+    Name: TBytes;
+    Value: TBytes;
 begin
-    Result := False;
     Stream.Clear;
     for i := 0 to List.Count - 1 do begin
-        Name := UTF8Encode(List.Names[i]);
-        Value := UTF8Encode(List.ValueFromIndex[i]);
-        Stream.Write(Pointer(Name)^, Length(Name));
+        Name := TEncoding.UTF8.GetBytes(List.Names[i]);
+        Value := TEncoding.UTF8.GetBytes(List.ValueFromIndex[i]);
+        Stream.Write(Name[0], Length(Name));
         Data := $0D;
         Stream.Write(Data, 1);
         Data := $0A;
         Stream.Write(Data, 1);
-        Stream.Write(Pointer(Value)^, Length(Value));
+        Stream.Write(Value, Length(Value));
         Data := $0D;
         Stream.Write(Data, 1);
         Data := $0A;
@@ -1061,9 +1211,10 @@ end;
 function TOpusTagFrame.GetAsList(var List: TStrings): Boolean;
 var
     Data: Byte;
-    AnsiStr: AnsiString;
+    Bytes: TBytes;
     Name: String;
     Value: String;
+    ByteCounter: Integer;
 begin
     Result := False;
     List.Clear;
@@ -1072,7 +1223,8 @@ begin
     end;
     Stream.Seek(0, soBeginning);
     while Stream.Position < Stream.Size do begin
-        AnsiStr := '';
+        SetLength(Bytes, 0);
+        ByteCounter := 0;
         repeat
             Stream.Read(Data, 1);
             if Data = $0D then begin
@@ -1081,10 +1233,12 @@ begin
                     Break;
                 end;
             end;
-            AnsiStr := AnsiStr + AnsiChar(Data);
+            Bytes[ByteCounter] := Data;
+            Inc(ByteCounter);
         until Stream.Position >= Stream.Size;
-        Name := UTF8Decode(AnsiStr);
-        AnsiStr := '';
+        Name := TEncoding.UTF8.GetString(Bytes);
+        SetLength(Bytes, 0);
+        ByteCounter := 0;
         repeat
             Stream.Read(Data, 1);
             if Data = $0D then begin
@@ -1093,9 +1247,10 @@ begin
                     Break;
                 end;
             end;
-            AnsiStr := AnsiStr + AnsiChar(Data);
+            Bytes[ByteCounter] := Data;
+            Inc(ByteCounter);
         until Stream.Position >= Stream.Size;
-        Value := UTF8Decode(AnsiStr);
+        Value := TEncoding.UTF8.GetString(Bytes);
         List.Append(Name + '=' + Value);
         Result := True;
     end;
@@ -1120,7 +1275,6 @@ end;
 
 function TOpusTagFrame.Assign(OpusTagFrame: TOpusTagFrame): Boolean;
 begin
-    Result := False;
     Clear;
     if OpusTagFrame <> nil then begin
         Format := OpusTagFrame.Format;
@@ -1139,7 +1293,9 @@ begin
     FillDefault;
     FirstOGGPage := TMemoryStream.Create;
     WritePadding := OpusTagLibraryWritePadding;
-    PaddingSize := OpusTagLibraryPaddingSize;
+    PaddingSizeToWrite := OpusTagLibraryPaddingSize;
+    UpperCaseFieldNamesToWrite := OpusTagLibraryDefaultUpperCaseFieldNamesToWrite;
+    ParsePlayTime := OpusTagLibraryDefaultParsePlayTime;
     VorbisData := TMemoryStream.Create;
 end;
 
@@ -1153,7 +1309,18 @@ end;
 
 procedure TOpusTag.FillDefault;
 begin
-    Info.FPage.ID := OGG_PAGE_ID;
+    {$IFDEF OVAOTL_MOBILE}
+    Info.FPage.ID[1] := Ord(OGG_PAGE_ID[0]);
+    Info.FPage.ID[2] := Ord(OGG_PAGE_ID[1]);
+    Info.FPage.ID[3] := Ord(OGG_PAGE_ID[2]);
+    Info.FPage.ID[4] := Ord(OGG_PAGE_ID[3]);
+    {$ELSE}
+    Info.FPage.ID[1] := Ord(OGG_PAGE_ID[1]);
+    Info.FPage.ID[2] := Ord(OGG_PAGE_ID[2]);
+    Info.FPage.ID[3] := Ord(OGG_PAGE_ID[3]);
+    Info.FPage.ID[4] := Ord(OGG_PAGE_ID[4]);
+    {$ENDIF}
+
     Info.FPage.StreamVersion := 0;
     Info.FPage.TypeFlag := 0;
     Info.FPage.AbsolutePosition := 0;
@@ -1163,7 +1330,18 @@ begin
     Info.FPage.Segments := 1;
     Info.FPage.LacingValues[1] := 19;
 
-    Info.SPage.ID := OGG_PAGE_ID;
+    {$IFDEF OVAOTL_MOBILE}
+    Info.SPage.ID[1] := Ord(OGG_PAGE_ID[0]);
+    Info.SPage.ID[2] := Ord(OGG_PAGE_ID[1]);
+    Info.SPage.ID[3] := Ord(OGG_PAGE_ID[2]);
+    Info.SPage.ID[4] := Ord(OGG_PAGE_ID[3]);
+    {$ELSE}
+    Info.SPage.ID[1] := Ord(OGG_PAGE_ID[1]);
+    Info.SPage.ID[2] := Ord(OGG_PAGE_ID[2]);
+    Info.SPage.ID[3] := Ord(OGG_PAGE_ID[3]);
+    Info.SPage.ID[4] := Ord(OGG_PAGE_ID[4]);
+    {$ENDIF}
+
     Info.SPage.StreamVersion := 0;
     Info.SPage.TypeFlag := 0;
     Info.SPage.AbsolutePosition := 0;
@@ -1173,7 +1351,26 @@ begin
     Info.SPage.Segments := 1;
     Info.SPage.LacingValues[1] := 19;
 
-    Info.OpusParameters.ID := OPUS_PARAMETERS_ID;
+    {$IFDEF OVAOTL_MOBILE}
+    Info.OpusParameters.ID[1] := Ord(OPUS_PARAMETERS_ID[0]);
+    Info.OpusParameters.ID[2] := Ord(OPUS_PARAMETERS_ID[1]);
+    Info.OpusParameters.ID[3] := Ord(OPUS_PARAMETERS_ID[2]);
+    Info.OpusParameters.ID[4] := Ord(OPUS_PARAMETERS_ID[3]);
+    Info.OpusParameters.ID[5] := Ord(OPUS_PARAMETERS_ID[4]);
+    Info.OpusParameters.ID[6] := Ord(OPUS_PARAMETERS_ID[5]);
+    Info.OpusParameters.ID[7] := Ord(OPUS_PARAMETERS_ID[6]);
+    Info.OpusParameters.ID[8] := Ord(OPUS_PARAMETERS_ID[7]);
+    {$ELSE}
+    Info.OpusParameters.ID[1] := Ord(OPUS_PARAMETERS_ID[1]);
+    Info.OpusParameters.ID[2] := Ord(OPUS_PARAMETERS_ID[2]);
+    Info.OpusParameters.ID[3] := Ord(OPUS_PARAMETERS_ID[3]);
+    Info.OpusParameters.ID[4] := Ord(OPUS_PARAMETERS_ID[4]);
+    Info.OpusParameters.ID[5] := Ord(OPUS_PARAMETERS_ID[5]);
+    Info.OpusParameters.ID[6] := Ord(OPUS_PARAMETERS_ID[6]);
+    Info.OpusParameters.ID[7] := Ord(OPUS_PARAMETERS_ID[7]);
+    Info.OpusParameters.ID[8] := Ord(OPUS_PARAMETERS_ID[8]);
+    {$ENDIF}
+
     Info.OpusParameters.BitstreamVersion := 0;
     Info.OpusParameters.ChannelCount := 0;
     Info.OpusParameters.PreSkip := 0;
@@ -1181,12 +1378,67 @@ begin
     Info.OpusParameters.OutputGain := 0;
     Info.OpusParameters.MappingFamily := 0;
 
-    Info.Tag.ID := OPUS_TAG_ID;
+    {$IFDEF OVAOTL_MOBILE}
+    Info.Tag.ID[1] := Ord(OPUS_TAG_ID[0]);
+    Info.Tag.ID[2] := Ord(OPUS_TAG_ID[1]);
+    Info.Tag.ID[3] := Ord(OPUS_TAG_ID[2]);
+    Info.Tag.ID[4] := Ord(OPUS_TAG_ID[3]);
+    Info.Tag.ID[5] := Ord(OPUS_TAG_ID[4]);
+    Info.Tag.ID[6] := Ord(OPUS_TAG_ID[5]);
+    Info.Tag.ID[7] := Ord(OPUS_TAG_ID[6]);
+    Info.Tag.ID[8] := Ord(OPUS_TAG_ID[7]);
+    {$ELSE}
+    Info.Tag.ID[1] := Ord(OPUS_TAG_ID[1]);
+    Info.Tag.ID[2] := Ord(OPUS_TAG_ID[2]);
+    Info.Tag.ID[3] := Ord(OPUS_TAG_ID[3]);
+    Info.Tag.ID[4] := Ord(OPUS_TAG_ID[4]);
+    Info.Tag.ID[5] := Ord(OPUS_TAG_ID[5]);
+    Info.Tag.ID[6] := Ord(OPUS_TAG_ID[6]);
+    Info.Tag.ID[7] := Ord(OPUS_TAG_ID[7]);
+    Info.Tag.ID[8] := Ord(OPUS_TAG_ID[8]);
+    {$ENDIF}
     Info.Tag.Fields := 0;
-
-    Info.VorbisTag.ID := VORBIS_TAG_ID;
-
+    {$IFDEF OVAOTL_MOBILE}
+    Info.VorbisTag.ID[1] := Ord(VORBIS_TAG_ID[0]);
+    Info.VorbisTag.ID[2] := Ord(VORBIS_TAG_ID[1]);
+    Info.VorbisTag.ID[3] := Ord(VORBIS_TAG_ID[2]);
+    Info.VorbisTag.ID[4] := Ord(VORBIS_TAG_ID[3]);
+    Info.VorbisTag.ID[5] := Ord(VORBIS_TAG_ID[4]);
+    Info.VorbisTag.ID[6] := Ord(VORBIS_TAG_ID[5]);
+    Info.VorbisTag.ID[7] := Ord(VORBIS_TAG_ID[6]);
+    {$ELSE}
+    Info.VorbisTag.ID[1] := Ord(VORBIS_TAG_ID[1]);
+    Info.VorbisTag.ID[2] := Ord(VORBIS_TAG_ID[2]);
+    Info.VorbisTag.ID[3] := Ord(VORBIS_TAG_ID[3]);
+    Info.VorbisTag.ID[4] := Ord(VORBIS_TAG_ID[4]);
+    Info.VorbisTag.ID[5] := Ord(VORBIS_TAG_ID[5]);
+    Info.VorbisTag.ID[6] := Ord(VORBIS_TAG_ID[6]);
+    Info.VorbisTag.ID[7] := Ord(VORBIS_TAG_ID[7]);
+    {$ENDIF}
     Info.SPagePos := 47;
+end;
+
+procedure TOpusTag.DeleteAllCoverArts;
+var
+    i: Integer;
+begin
+    for i := Count - 1 downto 0 do begin
+        if Frames[i].IsCoverArt then begin
+            DeleteFrame(i);
+        end;
+    end;
+end;
+
+function TOpusTag.CoverArtCount: Integer;
+var
+    i: Integer;
+begin
+    Result := 0;
+    for i := Count - 1 downto 0 do begin
+        if Frames[i].IsCoverArt then begin
+            Inc(Result);
+        end;
+    end;
 end;
 
 procedure TOpusTag.DeleteAllFrames;
@@ -1226,7 +1478,6 @@ function TOpusTag.LoadFromFile(FileName: String): Integer;
 var
     FileStream: TFileStream;
 begin
-    Result := OPUSTAGLIBRARY_ERROR;
     //Clear;
     Loaded := False;
     Format := ofUnknown;
@@ -1257,7 +1508,7 @@ begin
     Result := nil;
     try
         SetLength(Frames, Length(Frames) + 1);
-        Frames[Length(Frames) - 1] := TOpusTagFrame.Create;
+        Frames[Length(Frames) - 1] := TOpusTagFrame.Create(Self);
         Frames[Length(Frames) - 1].Name := Name;
         Frames[Length(Frames) - 1].Index := Length(Frames) - 1;
         Result := Frames[Length(Frames) - 1];
@@ -1292,13 +1543,13 @@ begin
     Result := True;
 end;
 
-function TOpusTag.FrameExists(Name: AnsiString): Integer;
+function TOpusTag.FrameExists(Name: String): Integer;
 var
     i: Integer;
 begin
     Result := -1;
     for i := 0 to Length(Frames) - 1 do begin
-        if Name = Frames[i].Name then begin
+        if UpperCase(Name) = UpperCase(Frames[i].Name) then begin
             Result := i;
             Break;
         end;
@@ -1311,7 +1562,7 @@ var
 begin
     Result := 0;
     for i := 0 to Length(Frames) - 1 do begin
-        if WideUpperCase(Name) = WideUpperCase(Frames[i].Name) then begin
+        if UpperCase(Name) = UpperCase(Frames[i].Name) then begin
             Inc(Result);
         end;
     end;
@@ -1320,10 +1571,11 @@ end;
 function TOpusTag.BuildTag(var Stream: TMemoryStream; PaddingSize: Cardinal): Boolean;
 var
     Fields, Size: Integer;
-    VendorStringAnsi: AnsiString;
+    Bytes: TBytes;
     i: Integer;
     Data: Byte;
 begin
+    Result := False;
     Fields := Count;
     // Write frame ID, vendor info and number of fields
     if Format = ofOpus then begin
@@ -1332,16 +1584,26 @@ begin
     if Format = ofVorbis then begin
         Stream.Write(Info.VorbisTag.ID, SizeOf(Info.VorbisTag.ID));
     end;
-    VendorStringAnsi := UTF8Encode(VendorString);
-    Size := Length(VendorStringAnsi);
+    Bytes := TEncoding.UTF8.GetBytes(VendorString);
+    Size := Length(Bytes);
     Stream.Write(Size, SizeOf(Size));
-    Stream.Write(Pointer(VendorStringAnsi)^, Size);
+    Stream.Write(Bytes[0], Length(Bytes));
     Stream.Write(Fields, SizeOf(Fields));
     // Write tag fields
     for i := 0 to Count - 1 do begin
-        Size := Length(Frames[i].Name) + 1 + Frames[i].Stream.Size;
+        if UpperCaseFieldNamesToWrite then begin
+            Size := Length(UpperCase(Frames[i].Name)) + 1 + Frames[i].Stream.Size;
+        end else begin
+            Size := Length(Frames[i].Name) + 1 + Frames[i].Stream.Size;
+        end;
         Stream.Write(Size, SizeOf(Size));
-        Stream.Write(Pointer(Frames[i].Name)^, Length(Frames[i].Name));
+        SetLength(Bytes, 0);
+        if UpperCaseFieldNamesToWrite then begin
+            Bytes := TEncoding.UTF8.GetBytes(UpperCase(Frames[i].Name));
+        end else begin
+            Bytes := TEncoding.UTF8.GetBytes(Frames[i].Name);
+        end;
+        Stream.Write(Bytes[0], Length(Bytes));
         Data := Ord('=');
         Stream.Write(Data, 1);
         Frames[i].Stream.Seek(0, soBeginning);
@@ -1370,12 +1632,12 @@ end;
 function TOpusTag.CalculateTagSize(IncludePadding: Boolean): Integer;
 var
     TotalTagSize: Integer;
-    VendorStringUTF8: AnsiString;
+    Bytes: TBytes;
     PaddingFrameIndex: Integer;
 begin
     TotalTagSize := CalculateTotalFramesSize;
-    VendorStringUTF8 := UTF8Encode(VendorString);
-    TotalTagSize := 8 + 4 + Length(VendorStringUTF8) + 4 + TotalTagSize;
+    Bytes := TEncoding.UTF8.GetBytes(VendorString);
+    TotalTagSize := 8 + 4 + Length(Bytes) + 4 + TotalTagSize;
     if NOT IncludePadding then begin
         PaddingFrameIndex := FrameExists('PADDING');
         if PaddingFrameIndex > - 1 then begin
@@ -1416,9 +1678,12 @@ begin
     Result := Length(Frames);
 end;
 
-procedure TOpusTag.AddTextFrame(Name: String; Text: String);
+function TOpusTag.AddTextFrame(Name: String; Text: String): Integer;
 begin
-    AddFrame(Name).SetAsText(Text);
+    with AddFrame(Name) do begin
+        SetAsText(Text);
+        Result := Index;
+    end;
 end;
 
 function TOpusTag.AddBinaryFrame(Name: String; BinaryStream: TStream): Boolean;
@@ -1434,6 +1699,7 @@ var
     PreviousPosition: Int64;
     EncodedStream: TMemoryStream;
 begin
+    Result := False;
     if (FrameIndex >= Length(Frames))
     OR (FrameIndex < 0)
     then begin
@@ -1450,6 +1716,7 @@ begin
         Frames[FrameIndex].Stream.Seek(0, soBeginning);
         Frames[FrameIndex].Format := otffBinary;
         BinaryStream.Seek(PreviousPosition, soBeginning);
+        Result := True;
     finally
         FreeAndNil(EncodedStream);
     end;
@@ -1497,7 +1764,7 @@ begin
     i := 0;
     l := Length(Frames);
     while (i < l)
-    AND (WideUpperCase(Frames[i].Name) <> WideUpperCase(Name))
+    AND (UpperCase(Frames[i].Name) <> UpperCase(Name))
     do begin
         inc(i);
     end;
@@ -1516,7 +1783,7 @@ begin
     i := 0;
     l := Length(Frames);
     while (i < l)
-    AND (WideUpperCase(Frames[i].Name) <> WideUpperCase(Name))
+    AND (UpperCase(Frames[i].Name) <> UpperCase(Name))
     do begin
         inc(i);
     end;
@@ -1536,16 +1803,27 @@ begin
     l := Length(Frames);
     i := 0;
     while (i <> l)
-    AND (WideUpperCase(Frames[i].Name) <> WideUpperCase(Name))
+    AND (UpperCase(Frames[i].Name) <> UpperCase(Name))
     do begin
         inc(i);
     end;
     if i = l then begin
         Result := '';
     end else begin
-        if Frames[i].Format = otffText then begin
-            Result := Frames[i].GetAsText;
-        end;
+        Result := Frames[i].GetAsText;
+    end;
+end;
+
+procedure TOpusTag.ReadOpusAudioAttributes(Stream: TStream);
+var
+    PreviousPosition: Int64;
+begin
+    PreviousPosition := Stream.Position;
+    try
+        Stream.Seek($1C, soBeginning);
+        Stream.Read(Info.OpusParameters, SizeOf(Info.OpusParameters));
+    finally
+        Stream.Seek(PreviousPosition, soBeginning);
     end;
 end;
 
@@ -1558,7 +1836,7 @@ begin
     l := Length(Frames);
     i := 0;
     while (i <> l)
-    AND (WideUpperCase(Frames[i].Name) <> WideUpperCase(Name))
+    AND (UpperCase(Frames[i].Name) <> UpperCase(Name))
     do begin
         inc(i);
     end;
@@ -1582,22 +1860,25 @@ begin
     end;
 end;
 
-function TOpusTag.AddPictureFrame(PictureStream: TStream; PictureType: Cardinal; MIMEType: AnsiString; Description: String; Width: Cardinal; Height: Cardinal; ColorDepth: Cardinal; NoOfColors: Cardinal): Boolean;
+function TOpusTag.AddCoverArtFrame(PictureStream: TStream; CoverArtInfo: TOpusVorbisCoverArtInfo): Integer;
 begin
-    Result := False;
     try
-        Result := SetPictureFrame(AddFrame(OPUSTAGLIBRARY_FRAMENAME_METADATA_BLOCK_PICTURE).Index, PictureStream, PictureType, MIMEType, Description, Width, Height, ColorDepth, NoOfColors);
+        Result := AddFrame(OPUSTAGLIBRARY_FRAMENAME_METADATA_BLOCK_PICTURE).Index;
+        if NOT SetCoverArtFrame(Result, PictureStream, CoverArtInfo) then begin
+            DeleteFrame(Result);
+            Result := - 1;
+        end;
     except
-        Result := False;
+        Result := - 1;
     end;
 end;
 
-function TOpusTag.SetPictureFrame(Index: Integer; PictureStream: TStream; PictureType: Cardinal; MIMEType: AnsiString; Description: String; Width: Cardinal; Height: Cardinal; ColorDepth: Cardinal; NoOfColors: Cardinal): Boolean;
+function TOpusTag.SetCoverArtFrame(Index: Integer; PictureStream: TStream; CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
 var
     MIMETypeLength: Cardinal;
     DescriptionLength: Cardinal;
     LengthOfPictureData: Cardinal;
-    DescriptionAnsi: AnsiString;
+    Bytes: TBytes;
     EncodedStream: TMemoryStream;
     NewStream: TMemoryStream;
 begin
@@ -1607,36 +1888,42 @@ begin
     end;
     try
         try
-            NewStream := TMemoryStream.Create;
-            EncodedStream := TMemoryStream.Create;
-            Frames[Index].Stream.Clear;
-            PictureType := ReverseBytes(PictureType);
-            NewStream.Write(PictureType, 4);
-            MIMEType := LowerCase(MIMEType);
-            MIMETypeLength := ReverseBytes(Length(MIMEType));
-            NewStream.Write(MIMETypeLength, 4);
-            NewStream.Write(PANSIChar(MIMEType)^, Length(MIMEType));
-            DescriptionAnsi := UTF8Encode(Description);
-            DescriptionLength := ReverseBytes(Length(DescriptionAnsi));
-            NewStream.Write(DescriptionLength, 4);
-            NewStream.Write(PANSIChar(DescriptionAnsi)^, Length(DescriptionAnsi));
-            Width := ReverseBytes(Width);
-            NewStream.Write(Width, 4);
-            Height := ReverseBytes(Height);
-            NewStream.Write(Height, 4);
-            ColorDepth := ReverseBytes(ColorDepth);
-            NewStream.Write(ColorDepth, 4);
-            NoOfColors := ReverseBytes(NoOfColors);
-            NewStream.Write(NoOfColors, 4);
-            LengthOfPictureData := ReverseBytes(PictureStream.Size);
-            NewStream.Write(LengthOfPictureData, 4);
-            PictureStream.Seek(0, soBeginning);
-            NewStream.CopyFrom(PictureStream, PictureStream.Size);
-            NewStream.Seek(0, soBeginning);
-            EncodeStream(NewStream, EncodedStream);
-            EncodedStream.Seek(0, soBeginning);
-            Frames[Index].Stream.CopyFrom(EncodedStream, EncodedStream.Size);
-            Frames[Index].Stream.Seek(0, soBeginning);
+            with CoverArtInfo do begin
+                NewStream := TMemoryStream.Create;
+                EncodedStream := TMemoryStream.Create;
+                Frames[Index].Stream.Clear;
+                PictureType := ReverseBytes(PictureType);
+                NewStream.Write(PictureType, 4);
+                MIMEType := LowerCase(MIMEType);
+                MIMETypeLength := ReverseBytes(Length(MIMEType));
+                NewStream.Write(MIMETypeLength, 4);
+                Bytes := TEncoding.UTF8.GetBytes(MIMEType);
+                NewStream.Write(Bytes[0], Length(Bytes));
+                SetLength(Bytes, 0);
+                Bytes := TEncoding.UTF8.GetBytes(Description);
+                DescriptionLength := ReverseBytes(Length(Bytes));
+                NewStream.Write(DescriptionLength, 4);
+                NewStream.Write(Bytes[0], Length(Bytes));
+                Width := ReverseBytes(Width);
+                NewStream.Write(Width, 4);
+                Height := ReverseBytes(Height);
+                NewStream.Write(Height, 4);
+                ColorDepth := ReverseBytes(ColorDepth);
+                NewStream.Write(ColorDepth, 4);
+                NoOfColors := ReverseBytes(NoOfColors);
+                NewStream.Write(NoOfColors, 4);
+                if Assigned(PictureStream) then begin
+                    LengthOfPictureData := ReverseBytes(PictureStream.Size);
+                    NewStream.Write(LengthOfPictureData, 4);
+                    PictureStream.Seek(0, soBeginning);
+                    NewStream.CopyFrom(PictureStream, PictureStream.Size);
+                end;
+                NewStream.Seek(0, soBeginning);
+                EncodeStream(NewStream, EncodedStream);
+                EncodedStream.Seek(0, soBeginning);
+                Frames[Index].Stream.CopyFrom(EncodedStream, EncodedStream.Size);
+                Frames[Index].Stream.Seek(0, soBeginning);
+            end;
             Result := True;
         finally
             Frames[Index].Format := otffCoverArt;
@@ -1648,60 +1935,122 @@ begin
     end;
 end;
 
-function TOpusTag.GetPictureFromFrame(Index: Integer; var PictureStream: TStream; var PictureType: Cardinal; var MIMEType: AnsiString; var Description: String; var Width: Cardinal; var Height: Cardinal; var ColorDepth: Cardinal; var NoOfColors: Cardinal): Boolean;
+function TOpusTag.GetCoverArtFromFrame(Index: Integer; var PictureStream: TStream; var CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
 var
-    DataByte: Byte;
     MIMETypeLength: Cardinal;
     DescriptionLength: Cardinal;
     LengthOfPictureData: Cardinal;
-    DescriptionAnsi: AnsiString;
+    Bytes: TBytes;
     DecodedStream: TMemoryStream;
-    i: Integer;
 begin
     Result := False;
+    with CoverArtInfo do begin
+        PictureType := 0;
+        MIMEType := '';
+        Description := '';
+        Width := 0;
+        Height := 0;
+        ColorDepth := 0;
+        NoOfColors := 0;
+    end;
     if Frames[Index].Name <> OPUSTAGLIBRARY_FRAMENAME_METADATA_BLOCK_PICTURE then begin
         Exit;
     end;
     try
         try
-            PictureType := 0;
-            MIMEType := '';
-            Description := '';
-            Width := 0;
-            Height := 0;
-            ColorDepth := 0;
-            NoOfColors := 0;
-            DecodedStream := TMemoryStream.Create;
-            Frames[Index].Stream.Seek(0, soBeginning);
-            DecodeStream(Frames[Index].Stream, DecodedStream);
-            DecodedStream.Seek(0, soBeginning);
-            DecodedStream.Read(PictureType, 4);
-            PictureType := ReverseBytes(PictureType);
-            DecodedStream.Read(MIMETypeLength, 4);
-            MIMETypeLength := ReverseBytes(MIMETypeLength);
-            for i := 0 to MIMETypeLength - 1 do begin
-                DecodedStream.Read(DataByte, 1);
-                MIMEType := MIMEType + AnsiChar(DataByte);
+            with CoverArtInfo do begin
+                DecodedStream := TMemoryStream.Create;
+                Frames[Index].Stream.Seek(0, soBeginning);
+                DecodeStream(Frames[Index].Stream, DecodedStream);
+                DecodedStream.Seek(0, soBeginning);
+                DecodedStream.Read(PictureType, 4);
+                PictureType := ReverseBytes(PictureType);
+                DecodedStream.Read(MIMETypeLength, 4);
+                MIMETypeLength := ReverseBytes(MIMETypeLength);
+                SetLength(Bytes, MIMETypeLength);
+                DecodedStream.Read(Bytes[0], MIMETypeLength);
+                CoverArtInfo.MIMEType := TEncoding.UTF8.GetString(Bytes);
+                DecodedStream.Read(DescriptionLength, 4);
+                DescriptionLength := ReverseBytes(DescriptionLength);
+                SetLength(Bytes, DescriptionLength);
+                DecodedStream.Read(Bytes[0], DescriptionLength);
+                Description := TEncoding.UTF8.GetString(Bytes);
+                DecodedStream.Read(Width, 4);
+                Width := ReverseBytes(Width);
+                DecodedStream.Read(Height, 4);
+                Height := ReverseBytes(Height);
+                DecodedStream.Read(ColorDepth, 4);
+                ColorDepth := ReverseBytes(ColorDepth);
+                DecodedStream.Read(NoOfColors, 4);
+                NoOfColors := ReverseBytes(NoOfColors);
+                DecodedStream.Read(LengthOfPictureData, 4);
+                LengthOfPictureData := ReverseBytes(LengthOfPictureData);
+                SizeOfPictureData := LengthOfPictureData;
+                PictureStream.CopyFrom(DecodedStream, LengthOfPictureData);
+                PictureStream.Seek(0, soBeginning);
             end;
-            DecodedStream.Read(DescriptionLength, 4);
-            DescriptionLength := ReverseBytes(DescriptionLength);
-            for i := 0 to DescriptionLength - 1 do begin
+            Result := True;
+        finally
+            FreeAndNil(DecodedStream);
+        end;
+    except
+        Result := False;
+    end;
+end;
+
+function TOpusTag.GetCoverArtInfo(Index: Integer; var CoverArtInfo: TOpusVorbisCoverArtInfo): Boolean;
+var
+    DataByte: Byte;
+    MIMETypeLength: Cardinal;
+    DescriptionLength: Cardinal;
+    LengthOfPictureData: Cardinal;
+    Bytes: TBytes;
+    DecodedStream: TMemoryStream;
+begin
+    Result := False;
+    with CoverArtInfo do begin
+        PictureType := 0;
+        MIMEType := '';
+        Description := '';
+        Width := 0;
+        Height := 0;
+        ColorDepth := 0;
+        NoOfColors := 0;
+    end;
+    if Frames[Index].Name <> OPUSTAGLIBRARY_FRAMENAME_METADATA_BLOCK_PICTURE then begin
+        Exit;
+    end;
+    try
+        try
+            with CoverArtInfo do begin
+                DecodedStream := TMemoryStream.Create;
+                Frames[Index].Stream.Seek(0, soBeginning);
+                DecodeStream(Frames[Index].Stream, DecodedStream);
+                DecodedStream.Seek(0, soBeginning);
+                DecodedStream.Read(PictureType, 4);
+                PictureType := ReverseBytes(PictureType);
+                DecodedStream.Read(MIMETypeLength, 4);
+                MIMETypeLength := ReverseBytes(MIMETypeLength);
+                SetLength(Bytes, MIMETypeLength);
+                DecodedStream.Read(Bytes[0], MIMETypeLength);
+                CoverArtInfo.MIMEType := TEncoding.UTF8.GetString(Bytes);
+                DecodedStream.Read(DescriptionLength, 4);
+                DescriptionLength := ReverseBytes(DescriptionLength);
+                SetLength(Bytes, DescriptionLength);
                 DecodedStream.Read(DataByte, 1);
-                DescriptionAnsi := DescriptionAnsi + AnsiChar(DataByte);
+                Description := TEncoding.UTF8.GetString(Bytes);
+                DecodedStream.Read(Width, 4);
+                Width := ReverseBytes(Width);
+                DecodedStream.Read(Height, 4);
+                Height := ReverseBytes(Height);
+                DecodedStream.Read(ColorDepth, 4);
+                ColorDepth := ReverseBytes(ColorDepth);
+                DecodedStream.Read(NoOfColors, 4);
+                NoOfColors := ReverseBytes(NoOfColors);
+                DecodedStream.Read(LengthOfPictureData, 4);
+                LengthOfPictureData := ReverseBytes(LengthOfPictureData);
+                SizeOfPictureData := LengthOfPictureData;
             end;
-            Description := UTF8Decode(DescriptionAnsi);
-            DecodedStream.Read(Width, 4);
-            Width := ReverseBytes(Width);
-            DecodedStream.Read(Height, 4);
-            Height := ReverseBytes(Height);
-            DecodedStream.Read(ColorDepth, 4);
-            ColorDepth := ReverseBytes(ColorDepth);
-            DecodedStream.Read(NoOfColors, 4);
-            NoOfColors := ReverseBytes(NoOfColors);
-            DecodedStream.Read(LengthOfPictureData, 4);
-            LengthOfPictureData := ReverseBytes(LengthOfPictureData);
-            PictureStream.CopyFrom(DecodedStream, LengthOfPictureData);
-            PictureStream.Seek(0, soBeginning);
             Result := True;
         finally
             FreeAndNil(DecodedStream);
@@ -1717,10 +2066,9 @@ var
     l: Integer;
     j: Integer;
 begin
-    Result := False;
     l := Length(Frames);
     i := 0;
-    while (i <> l) and (WideUpperCase(Frames[i].Name) <> WideUpperCase(Name)) do begin
+    while (i <> l) and (UpperCase(Frames[i].Name) <> UpperCase(Name)) do begin
         inc(i);
     end;
     if i = l then begin
@@ -1745,12 +2093,11 @@ function TOpusTag.Assign(Source: TOpusTag): Boolean;
 var
     i: Integer;
 begin
-    Result := False;
     Clear;
     FileName := Source.FileName;
     Format := Source.Format;
     Loaded := Source.Loaded;
-    VendorString := Source.VendorString;
+    //VendorString := Source.VendorString;
     for i := 0 to Length(Source.Frames) - 1 do begin
         AddFrame(Source.Frames[i].Name).Assign(Source.Frames[i]);
     end;
@@ -1774,7 +2121,7 @@ begin
     end;
 end;
 
-procedure TOpusTag.SetTagItem(const Data: AnsiString; DataStream: TMemoryStream);
+procedure TOpusTag.SetTagItem(const Data: String; DataStream: TMemoryStream);
 var
     Separator: Integer;
     FieldID: string;
@@ -1799,21 +2146,18 @@ end;
 procedure TOpusTag.ReadTag(const Source: TStream; OGGStream: TOGGStream);
 var
     Index, Size, Position: Integer;
-    Data: array [1..250] of ANSIChar;
+    Bytes: TBytes;
     DataStream: TMemoryStream;
     PreviousPosition: Int64;
     DataByte: Byte;
+    TempString: String;
 begin
     //* Read vendor string
-    FillChar(Data, SizeOf(Data), 0);
     Source.Read(Size, SizeOf(Size));
-    Position := Source.Position;
-    if Size > SizeOf(Data) then begin
-        Source.Read(Data, SizeOf(Data))
-    end else begin
-        Source.Read(Data, Size);
-    end;
-    VendorString := UTF8Decode(Trim(Data));
+    //Position := Source.Position;
+    SetLength(Bytes, Size);
+    Source.Read(Bytes[0], Size);
+    VendorString := TEncoding.UTF8.GetString(Bytes);
     //* Read tag count
     Source.Read(Info.Tag.Fields, SizeOf(Info.Tag.Fields));
     if Info.Tag.Fields > 0 then begin
@@ -1823,7 +2167,7 @@ begin
             Index := 1;
             repeat
                 DataStream.Clear;
-                FillChar(Data, SizeOf(Data), 0);
+                SetLength(Bytes, 0);
                 //* Query more data if needed
                 PreviousPosition := Source.Position;
                 while Source.Position + SizeOf(Size) > Source.Size do begin
@@ -1842,16 +2186,14 @@ begin
                     Source.Seek(PreviousPosition, soBeginning);
                 end;
                 //* Read tag data (to extract tag name)
-                if Size > SizeOf(Data) then begin
-                    Source.Read(Data, SizeOf(Data))
-                end else begin
-                    Source.Read(Data, Size);
-                end;
+                SetLength(Bytes, Size);
+                Source.Read(Bytes[0], Size);
                 //* Read tag data in stream
                 Source.Seek(Position, soBeginning);
                 DataStream.CopyFrom(Source, Size);
                 // Add Opus tag item
-                SetTagItem(Trim(Data), DataStream);
+                TempString := TEncoding.UTF8.GetString(Bytes);
+                SetTagItem(TempString, DataStream);
                 Source.Seek(Position + Size, soFromBeginning);
                 Inc(Index);
             until Index > Info.Tag.Fields;
@@ -1868,12 +2210,9 @@ begin
         OR (DataByte = 5)
         OR (Source.Size <= Source.Position);
         VorbisData.Clear;
-        Source.Seek(- 1, soFromCurrent);
         if Source.Size - Source.Position > 0 then begin
+            Source.Seek(- 1, soFromCurrent);
             VorbisData.CopyFrom(Source, Source.Size - Source.Position);
-
-            //VorbisData.SaveToFile('C:\CVB.raw');
-
         end;
     end;
     //if Format = ofOpus then begin
@@ -1881,10 +2220,23 @@ begin
     //end;
 end;
 
+procedure TOpusTag.ReadVorbisAudioAttributes(Stream: TStream);
+var
+    PreviousPosition: Int64;
+begin
+    PreviousPosition := Stream.Position;
+    try
+        Stream.Seek($1C, soBeginning);
+        Stream.Read(Info.VorbisParameters, SizeOf(Info.VorbisParameters));
+    finally
+        Stream.Seek(PreviousPosition, soBeginning);
+    end;
+end;
+
 function GetID3v2Size(const Source: TStream): Cardinal;
 type
     ID3v2Header = packed record
-        ID: array [1..3] of AnsiChar;
+        ID: array [1..3] of Byte;
         Version: Byte;
         Revision: Byte;
         Flags: Byte;
@@ -1897,7 +2249,10 @@ begin
     Result := 0;
     Source.Seek(0, soFromBeginning);
     Source.Read(Header, SizeOf(ID3v2Header));
-    if Header.ID = 'ID3' then begin
+    if (Header.ID[1] = Ord('I'))
+    AND (Header.ID[2] = Ord('D'))
+    AND (Header.ID[3] = Ord('3'))
+    then begin
         UnSyncSafe(Header.Size, 4, Result);
         Inc(Result, 10);
         if Result > Source.Size then begin
@@ -1915,9 +2270,22 @@ var
 begin
     Result := False;
     Info.ID3v2Size := GetID3v2Size(SourceFile);
+    Info.FileSize := SourceFile.Size;
     SourceFile.Seek(Info.ID3v2Size, soFromBeginning);
     OGGStream := TOGGStream.Create(SourceFile);
-    if OGGStream.FirstOGGHeader.ID <> OGG_PAGE_ID then begin
+    if
+    {$IFDEF OVAOTL_MOBILE}
+    (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[0]))
+    OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[1]))
+    OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[2]))
+    OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[3]))
+    {$ELSE}
+    (OGGStream.FirstOGGHeader.ID[1] <> Ord(OGG_PAGE_ID[1]))
+    OR (OGGStream.FirstOGGHeader.ID[2] <> Ord(OGG_PAGE_ID[2]))
+    OR (OGGStream.FirstOGGHeader.ID[3] <> Ord(OGG_PAGE_ID[3]))
+    OR (OGGStream.FirstOGGHeader.ID[4] <> Ord(OGG_PAGE_ID[4]))
+    {$ENDIF}
+    then begin
         Exit;
     end;
     FirstOGGPage.Clear;
@@ -1929,26 +2297,92 @@ begin
     try
         OGGStream.GetNextPageData(Data);
         Data.Seek(0, soBeginning);
-
-        //Data.SaveToFile('C:\2ndPage.raw');
-
         //* Check if Opus
         Data.Read(OpusTags.ID, SizeOf(OpusTags.ID));
-        if OpusTags.ID = OPUS_TAG_ID then begin
+        if
+        {$IFDEF OVAOTL_MOBILE}
+        (OpusTags.ID[1] = Ord(OPUS_TAG_ID[0]))
+        AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[1]))
+        AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[2]))
+        AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[3]))
+        AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[4]))
+        AND (OpusTags.ID[6] = Ord(OPUS_TAG_ID[5]))
+        AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[6]))
+        AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[7]))
+        {$ELSE}
+        (OpusTags.ID[1] = Ord(OPUS_TAG_ID[1]))
+        AND (OpusTags.ID[2] = Ord(OPUS_TAG_ID[2]))
+        AND (OpusTags.ID[3] = Ord(OPUS_TAG_ID[3]))
+        AND (OpusTags.ID[4] = Ord(OPUS_TAG_ID[4]))
+        AND (OpusTags.ID[5] = Ord(OPUS_TAG_ID[5]))
+        AND (OpusTags.ID[6] = Ord(OPUS_TAG_ID[6]))
+        AND (OpusTags.ID[7] = Ord(OPUS_TAG_ID[7]))
+        AND (OpusTags.ID[8] = Ord(OPUS_TAG_ID[8]))
+        {$ENDIF}
+        then begin
             Format := ofOpus;
+            ReadOpusAudioAttributes(SourceFile);
             ReadTag(Data, OGGStream);
             Result := True;
         end;
         Data.Seek(0, soBeginning);
         //* Check if Vorbis
         Data.Read(VorbisHeader.ID, SizeOf(VorbisHeader.ID));
-        if VorbisHeader.ID = VORBIS_TAG_ID then begin
+        if
+        {$IFDEF OVAOTL_MOBILE}
+        (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[0]))
+        AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[1]))
+        AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[2]))
+        AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[3]))
+        AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[4]))
+        AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[5]))
+        AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[6]))
+        {$ELSE}
+        (VorbisHeader.ID[1] = Ord(VORBIS_TAG_ID[1]))
+        AND (VorbisHeader.ID[2] = Ord(VORBIS_TAG_ID[2]))
+        AND (VorbisHeader.ID[3] = Ord(VORBIS_TAG_ID[3]))
+        AND (VorbisHeader.ID[4] = Ord(VORBIS_TAG_ID[4]))
+        AND (VorbisHeader.ID[5] = Ord(VORBIS_TAG_ID[5]))
+        AND (VorbisHeader.ID[6] = Ord(VORBIS_TAG_ID[6]))
+        AND (VorbisHeader.ID[7] = Ord(VORBIS_TAG_ID[7]))
+        {$ENDIF}
+        then begin
             Format := ofVorbis;
+            ReadVorbisAudioAttributes(SourceFile);
             ReadTag(Data, OGGStream);
             Result := True;
         end;
+        Info.HeaderOggPageCount := OGGStream.LastPageQueried;
+        if ParsePlayTime then begin
+            Info.SampleCount := GetSamples(SourceFile);
+            Info.PlayTime := GetPlayTime;
+            Info.BitRate := Trunc((Info.FileSize - CalculateTagSize(True)) / Info.PlayTime / 125);
+        end;
     finally
         FreeAndNil(Data);
+    end;
+end;
+
+function TOpusTag.GetPlayTime: Double;
+begin
+    Result := 0;
+    if Format = ofVorbis then begin
+        { Calculate duration time }
+        if Info.SampleCount > 0 then begin
+            if Info.VorbisParameters.SampleRate > 0 then begin
+                Result := Info.SampleCount / Info.VorbisParameters.SampleRate;
+            end;
+        end else begin
+            if (Info.VorbisParameters.BitRateNominal > 0) and (Info.VorbisParameters.ChannelMode > 0) then begin
+                Result := (Info.FileSize - Info.ID3v2Size) / Info.VorbisParameters.BitRateNominal / Info.VorbisParameters.ChannelMode / 125 * 2
+            end;
+        end;
+    end;
+    if Format = ofOpus then begin
+        { Calculate duration time }
+        if Info.SampleCount > 0 then begin
+            Result := Info.SampleCount / 48000;
+        end;
     end;
 end;
 
@@ -1994,7 +2428,6 @@ var
     Data: array [1..$FF] of Byte;
 begin
     // Calculate and set checksum for OGG frame
-    Result := False;
     Value := 0;
     CalculateCRC(Value, Header, Header.Segments + 27);
     Destination.Seek(Header.Segments + 27, soFromBeginning);
@@ -2009,7 +2442,7 @@ begin
     Result := True;
 end;
 
-function TOpusTag.AdjustPadding(TagSize: Cardinal): Boolean;
+function TOpusTag.AdjustPadding(TagSize: Integer): Boolean;
 var
     Tag: TMemoryStream;
     NewOGGTagStream: TMemoryStream;
@@ -2020,12 +2453,19 @@ var
     PaddingFrameIndex: Integer;
     i: Integer;
     ExistingPaddingSize: Integer;
+    PaddingSize: Integer;
+    WritePaddingLocal: Boolean;
 begin
     Result := False;
-    if NOT WritePadding then begin
+    PaddingSize := PaddingSizeToWrite;
+    WritePaddingLocal := WritePadding;
+    if (NOT WritePaddingLocal)
+    OR (PaddingSizeToWrite = 0)
+    then begin
         DeleteFrame(FrameExists(OPUSTAGLIBRARY_FRAMENAME_PADDING));
+        WritePaddingLocal := False;
     end else begin
-        if PaddingSize < Length(OPUSTAGLIBRARY_FRAMENAME_PADDING) + 1 + 4 + 1 then begin
+        if PaddingSizeToWrite < Length(OPUSTAGLIBRARY_FRAMENAME_PADDING) + 1 + 4 + 1 then begin
             PaddingSize := Length(OPUSTAGLIBRARY_FRAMENAME_PADDING) + 1 + 4 + 1;
         end;
     end;
@@ -2039,7 +2479,7 @@ begin
             DeleteFrame(FrameExists(OPUSTAGLIBRARY_FRAMENAME_PADDING));
             Result := True;
         end else begin
-            if WritePadding then begin
+            if WritePaddingLocal then begin
                 NewTagSize := CalculateTagSize(True);
                 NewWrappedTagSize := ProcessingOGGStream.CalculateWrappedStreamSize(NewTagSize);
                 if NewWrappedTagSize = TagSize then begin
@@ -2096,7 +2536,7 @@ begin
             end;
         end;
         if (NOT Result)
-        AND WritePadding
+        AND WritePaddingLocal
         then begin
             PaddingFrameIndex := AddFrame(OPUSTAGLIBRARY_FRAMENAME_PADDING).Index;
             TmpString := '';
@@ -2115,7 +2555,7 @@ end;
 function RebuildFile(FileName: String; Info: TFileInfo; TagOGGStream: TStream; ReplaceMode: Boolean): Integer;
 var
     Source, Destination: TFileStream;
-    BufferName: WideString;
+    BufferName: String;
     NewOGGStream: TOGGStream;
 
 begin
@@ -2211,11 +2651,12 @@ var
     NewPaddingSize: Integer;
     NewTagSize: Integer;
     NewWrappedTagSize: Integer;
-    Temp: Integer;
     NewFileCreate: Boolean;
 begin
-    Result := OPUSTAGLIBRARY_ERROR;
+    //Result := OPUSTAGLIBRARY_ERROR;
     NewFileCreate := False;
+    FitsInOldTag := False;
+    NewTagSize := 0;
     TagStream := nil;
     try
         if NOT FileExists(FileName) then begin
@@ -2259,6 +2700,13 @@ begin
                 end;
             end;
             Format := NewFileOpusTag.Format;
+            if NewFileOpusTag.VendorString <> '' then begin
+                Self.VendorString := NewFileOpusTag.VendorString;
+            end else begin
+                if Self.VendorString = '' then begin
+                    Self.VendorString := 'Unknown vendor';
+                end;
+            end;
             VorbisData.Clear;
             NewFileOpusTag.VorbisData.Seek(0, soBeginning);
             VorbisData.CopyFrom(NewFileOpusTag.VorbisData, NewFileOpusTag.VorbisData.Size);
@@ -2282,7 +2730,14 @@ begin
                     //* Wrap it in OGG container
                     Tag.Seek(0, soBeginning);
                     NewOGGStream.CreateTagStream(Tag, NewOGGTagStream);
-                    FitsInOldTag := OldTagSize >= NewOGGTagStream.Size;
+                    if (NOT WritePadding)
+                    OR (PaddingSizeToWrite = 0)
+                    then begin
+                        FitsInOldTag := OldTagSize = NewOGGTagStream.Size;
+                    end else begin
+                        FitsInOldTag := OldTagSize >= NewOGGTagStream.Size;
+                    end;
+                    //*
                 end;
                 //* Create a tag stream
                 Tag.Clear;
@@ -2295,11 +2750,12 @@ begin
                             Inc(NewPaddingSize);
                             NewWrappedTagSize := NewOGGStream.CalculateWrappedStreamSizeVorbis(NewTagSize + NewPaddingSize, NewTagSize + NewPaddingSize + VorbisData.Size);
                         until (NewWrappedTagSize >= OldTagSize)
-                        OR (NewPaddingSize >= PaddingSize);
+                        OR (NewPaddingSize >= PaddingSizeToWrite);
                         FitsInOldTag := NewWrappedTagSize = OldTagSize;
                     end;
                     if NOT FitsInOldTag then begin
                         if WritePadding then begin
+                            NewPaddingSize := Self.PaddingSizeToWrite;
                             NewOGGStream.CalculateWrappedStreamSizeEx(NewTagSize, VorbisData.Size, NewPaddingSize);
                         end else begin
                             NewPaddingSize := 0;
@@ -2337,5 +2793,124 @@ begin
     end;
 end;
 
+function TOpusTag.GetSamples(const Source: TStream): Int64;
+var
+    i: Integer;
+    Data: array [0..3] of Byte;
+    Header: TOggHeader;
+begin
+    Result := 0;
+    for i := 0 to 10 * 4096 do begin
+        Source.Seek(Source.Size - (4 + i), soBeginning);
+        Source.Read(Data, SizeOf(Data));
+        if
+        {$IFDEF OVAOTL_MOBILE}
+        (Data[0] = Ord(OGG_PAGE_ID[0]))
+        AND (Data[1] = Ord(OGG_PAGE_ID[1]))
+        AND (Data[2] = Ord(OGG_PAGE_ID[2]))
+        AND (Data[3] = Ord(OGG_PAGE_ID[3]))
+        {$ELSE}
+        (Data[0] = Ord(OGG_PAGE_ID[1]))
+        AND (Data[1] = Ord(OGG_PAGE_ID[2]))
+        AND (Data[2] = Ord(OGG_PAGE_ID[3]))
+        AND (Data[3] = Ord(OGG_PAGE_ID[4]))
+        {$ENDIF}
+        then begin
+            Source.Seek(- 4, soCurrent);
+            Source.Read(Header, SizeOf(TOggHeader));
+            Result := Header.AbsolutePosition;
+            exit;
+        end;
+    end;
+end;
+
+function OpusTagErrorCode2String(ErrorCode: Integer): String;
+begin
+    Result := 'Unknown error code.';
+    case ErrorCode of
+        OPUSTAGLIBRARY_SUCCESS: Result := 'Success.';
+        OPUSTAGLIBRARY_ERROR: Result := 'Unknown error occured.';
+        OPUSTAGLIBRARY_ERROR_NO_TAG_FOUND: Result := 'No Opus/Vorbis tags found.';
+        OPUSTAGLIBRARY_ERROR_EMPTY_TAG: Result := 'Opus/Vorbis tag is empty.';
+        OPUSTAGLIBRARY_ERROR_EMPTY_FRAMES: Result := 'Opus/Vorbis tag contains only empty frames.';
+        OPUSTAGLIBRARY_ERROR_OPENING_FILE: Result := 'Error opening file.';
+        OPUSTAGLIBRARY_ERROR_READING_FILE: Result := 'Error reading file.';
+        OPUSTAGLIBRARY_ERROR_WRITING_FILE: Result := 'Error writing file.';
+        OPUSTAGLIBRARY_ERROR_CORRUPT: Result := 'Error: corrupt file.';
+        //OPUSTAGLIBRARY_ERROR_DOESNT_FIT: Result := 'Error: WAV LIST INFO chunk doesn''t fit into the file.';
+        OPUSTAGLIBRARY_ERROR_NOT_SUPPORTED_VERSION: Result := 'Error: not supported Opus/Vorbis tag version.';
+        OPUSTAGLIBRARY_ERROR_NOT_SUPPORTED_FORMAT: Result := 'Error: not supported file format.';
+        OPUSTAGLIBRARY_ERROR_NEED_EXCLUSIVE_ACCESS: Result := 'Error: file is locked. Need exclusive access to write Opus/Vorbis tag to this file.';
+    end;
+end;
+
+Initialization
+
+        EncodeTable[0] := Ord('A');
+        EncodeTable[1] := Ord('B');
+        EncodeTable[2] := Ord('C');
+        EncodeTable[3] := Ord('D');
+        EncodeTable[4] := Ord('E');
+        EncodeTable[5] := Ord('F');
+        EncodeTable[6] := Ord('G');
+        EncodeTable[7] := Ord('H');
+        EncodeTable[8] := Ord('I');
+        EncodeTable[9] := Ord('J');
+        EncodeTable[10] := Ord('K');
+        EncodeTable[11] := Ord('L');
+        EncodeTable[12] := Ord('M');
+        EncodeTable[13] := Ord('N');
+        EncodeTable[14] := Ord('O');
+        EncodeTable[15] := Ord('P');
+        EncodeTable[16] := Ord('Q');
+        EncodeTable[17] := Ord('R');
+        EncodeTable[18] := Ord('S');
+        EncodeTable[19] := Ord('T');
+        EncodeTable[20] := Ord('U');
+        EncodeTable[21] := Ord('V');
+        EncodeTable[22] := Ord('W');
+        EncodeTable[23] := Ord('X');
+        EncodeTable[24] := Ord('Y');
+        EncodeTable[25] := Ord('Z');
+
+        EncodeTable[26] := Ord('a');
+        EncodeTable[27] := Ord('b');
+        EncodeTable[28] := Ord('c');
+        EncodeTable[29] := Ord('d');
+        EncodeTable[30] := Ord('e');
+        EncodeTable[31] := Ord('f');
+        EncodeTable[32] := Ord('g');
+        EncodeTable[33] := Ord('h');
+        EncodeTable[34] := Ord('i');
+        EncodeTable[35] := Ord('j');
+        EncodeTable[36] := Ord('k');
+        EncodeTable[37] := Ord('l');
+        EncodeTable[38] := Ord('m');
+        EncodeTable[39] := Ord('n');
+        EncodeTable[40] := Ord('o');
+        EncodeTable[41] := Ord('p');
+        EncodeTable[42] := Ord('q');
+        EncodeTable[43] := Ord('r');
+        EncodeTable[44] := Ord('s');
+        EncodeTable[45] := Ord('t');
+        EncodeTable[46] := Ord('u');
+        EncodeTable[47] := Ord('v');
+        EncodeTable[48] := Ord('w');
+        EncodeTable[49] := Ord('x');
+        EncodeTable[50] := Ord('y');
+        EncodeTable[51] := Ord('z');
+
+        EncodeTable[52] := Ord('0');
+        EncodeTable[53] := Ord('1');
+        EncodeTable[54] := Ord('2');
+        EncodeTable[55] := Ord('3');
+        EncodeTable[56] := Ord('4');
+        EncodeTable[57] := Ord('5');
+        EncodeTable[58] := Ord('6');
+        EncodeTable[59] := Ord('7');
+        EncodeTable[60] := Ord('8');
+        EncodeTable[61] := Ord('9');
+        EncodeTable[62] := Ord('+');
+        EncodeTable[63] := Ord('/');
 end.
 

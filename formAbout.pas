@@ -13,8 +13,8 @@ interface
 uses
   Windows, Forms, Controls, Classes, Graphics,
   ExtCtrls, JvExControls, JvScrollText,
-  JCLShell, pngimage,
-  uTelltaleSpeechExtractorConst, PngFunctions;
+  JCLShell,
+  uTelltaleSpeechExtractorConst, Vcl.Imaging.pngimage;
 
 type
   TfrmAbout = class(TForm)
@@ -61,7 +61,7 @@ end;
 
 procedure TfrmAbout.Image1Click(Sender: TObject);
 begin
-  shellexec(0, 'open', 'Http://quick.mixnmojo.com','', '', SW_SHOWNORMAL);
+  shellexec(0, 'open', 'http://quickandeasysoftware.net','', '', SW_SHOWNORMAL);
 end;
 
 end.
