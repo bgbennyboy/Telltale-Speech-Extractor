@@ -21,6 +21,7 @@ type
   EBundleReaderException = class (exception);
   EInvalidIniFile = class (exception);
   EBASSAudioException = class (exception);
+  EResourceDetectorError = class (exception);
 
   TAnnotationField = (
     AFAnnotation,

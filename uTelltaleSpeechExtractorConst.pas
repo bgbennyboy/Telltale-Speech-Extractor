@@ -12,7 +12,7 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.3.7.2';
+  strAppVersion:         string = '1.3.8';
   strAppTitle:           string = 'Telltale Speech Extractor';
   strAppURL:             string = 'http://quickandeasysoftware.net';
   
@@ -32,6 +32,25 @@ const
   strNoFilesToSave:         string = 'No visible files to save!';
   strAddNewCategory:        string = 'Add new category';
   strCategoryName:          string = 'Category name';
+  strMissingMenu:           string =  'Menu missing for game! Report this.';
+  strOpenDialogTitle: string = 'Choose a folder with .aud .ttarch  or .ttarch2 files';
+  strCSIFatalConspiracy: string = 'CSI Fatal Conspiracy has the music for each of its 5 parts stored in separate folders. ' +
+                                  'You''ll need to dump the music from each part manually.' + #13#13 +
+                                  'To do this click "Open Folder", scroll down to the "Pack" folder, select one of the CSI6 folders and click the "Go" button.'
+                                  + #13#13 +
+                                  'For example, select the CSI601 folder to dump the music from the first part.';
+
+  strCSIDeadlyIntent:    string = 'CSI Deadly Intent has the music for each of its 5 parts stored in separate folders. ' +
+                                  'You''ll need to dump the music from each part manually.' + #13#13 +
+                                  'To do this click "Open Folder", scroll down to the "Pack" folder, select one of the CSI5 folders and click the "Go" button.'
+                                  + #13#13 +
+                                  'For example, select the CSI501 folder to dump the music from the first part.';
+  strMultipleVoiceBundles: string = 'Error - couldn''t automatically find the voice bundle.' + #13#13 +
+                                    'It is likely that this folder contains the files for multiple episodes of a game.' + #13#13 +
+                                    'There are two possible solutions to this:' + #13#13 +
+                                    'Select an episode from the menu and the program will automatically find the files for that episode. Or...' + #13#13 +
+                                    'Choose "Open file" and select the exact file that you want to extract voices from.';
+
 
 implementation
 

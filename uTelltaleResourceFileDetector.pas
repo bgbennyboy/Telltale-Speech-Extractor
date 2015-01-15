@@ -12,7 +12,7 @@ interface
 
 uses
   Sysutils, Classes,
-  uTelltaleFuncs;
+  uTelltaleFuncs, uExplorerTypes, uTelltaleSpeechExtractorConst;
 
 type
   TAudioResFormat = (
@@ -38,10 +38,15 @@ const
   WalkingDeadS2_EP3_Bundle = 'WalkingDead_pc_WalkingDead203_voice.ttarch2';
   WalkingDeadS2_EP4_Bundle = 'WalkingDead_pc_WalkingDead204_voice.ttarch2';
   WalkingDeadS2_EP5_Bundle = 'WalkingDead_pc_WalkingDead205_voice.ttarch2';
+  BorderlandsEP1_Bundle = 'Borderlands_pc_Borderlands101_voice.ttarch2';
+  BorderlandsEP2_Bundle = 'Borderlands_pc_Borderlands102_voice.ttarch2';
+  BorderlandsEP3_Bundle = 'Borderlands_pc_Borderlands103_voice.ttarch2';
+  BorderlandsEP4_Bundle = 'Borderlands_pc_Borderlands104_voice.ttarch2';
+  BorderlandsEP5_Bundle = 'Borderlands_pc_Borderlands105_voice.ttarch2';
   //HACK - if add new game - also add it to the SpecificBundleNames list at the bottom
 var
-  FileNames, SpecificBundleNames: TStringList;
-  i, j: integer;
+  FileNames: TStringList;
+  i: integer;
   BundleFilename: string;
 begin
   Result := NOT_FOUND;
@@ -96,69 +101,48 @@ begin
 
     //For .ttarch2 bundles try and find a specific file
     case TheGame of
-      WolfAmongUs_Faith:              BundleFileName := WolfEP1_VoiceBundle;
-      WolfAmongUs_SmokeAndMirrors:    BundleFileName := WolfEP2_VoiceBundle;
-      WolfAmongUs_ACrookedMile:       BundleFileName := WolfEP3_VoiceBundle;
-      WolfAmongUs_InSheepsClothing:   BundleFileName := WolfEP4_VoiceBundle;
-      WolfAmongUs_CryWolf:            BundleFileName := WolfEP5_VoiceBundle;
-      WalkingDead_S2_AllThatRemains:  BundleFileName := WalkingDeadS2_EP1_Bundle;
-      WalkingDead_S2_AHouseDivided:   BundleFileName := WalkingDeadS2_EP2_Bundle;
-      WalkingDead_S2_InHarmsWay:      BundleFileName := WalkingDeadS2_EP3_Bundle;
-      WalkingDead_S2_AmidTheRuins:    BundleFileName := WalkingDeadS2_EP4_Bundle;
-      WalkingDead_S2_NoGoingBack:     BundleFileName := WalkingDeadS2_EP5_Bundle;
+      WolfAmongUs_Faith:                          BundleFileName := WolfEP1_VoiceBundle;
+      WolfAmongUs_SmokeAndMirrors:                BundleFileName := WolfEP2_VoiceBundle;
+      WolfAmongUs_ACrookedMile:                   BundleFileName := WolfEP3_VoiceBundle;
+      WolfAmongUs_InSheepsClothing:               BundleFileName := WolfEP4_VoiceBundle;
+      WolfAmongUs_CryWolf:                        BundleFileName := WolfEP5_VoiceBundle;
+      WalkingDead_S2_AllThatRemains:              BundleFileName := WalkingDeadS2_EP1_Bundle;
+      WalkingDead_S2_AHouseDivided:               BundleFileName := WalkingDeadS2_EP2_Bundle;
+      WalkingDead_S2_InHarmsWay:                  BundleFileName := WalkingDeadS2_EP3_Bundle;
+      WalkingDead_S2_AmidTheRuins:                BundleFileName := WalkingDeadS2_EP4_Bundle;
+      WalkingDead_S2_NoGoingBack:                 BundleFileName := WalkingDeadS2_EP5_Bundle;
+      TalesFromBorderlands_Zer0Sum:               BundleFileName := BorderlandsEP1_Bundle;
+      TalesFromBorderlands_AtlasMugged:           BundleFileName := BorderlandsEP2_Bundle;
+      TalesFromBorderlands_CatchARide:            BundleFileName := BorderlandsEP3_Bundle;
+      TalesFromBorderlands_EscapePlanBravo:       BundleFileName := BorderlandsEP4_Bundle;
+      TalesFromBorderlands_TheVaultOfTheTraveler: BundleFileName := BorderlandsEP5_Bundle;
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);
     for I := 0 to FileNames.Count - 1 do
     begin
-      //Check for the specific file
+      //For .ttarch2 bundles try and find a specific file - as bundles are often all in the same dir along with a boot music bundle
+      if Uppercase( ExtractFileExt( FileNames.Strings[i] )) = '.TTARCH2' then
+      begin
+        if TheGame = UnknownGame then //Open folder used - we dont know what game this is - so we cant choose the correct bundle
+          raise EResourceDetectorError.Create(strMultipleVoiceBundles);
+
+        //Try and match one of the bundles in the folder to the BundleFileName that we expect for that game
+        if UpperCase(FileNames.Strings[i]) = UpperCase(BundleFileName) then
+        begin
+          result := TTARCH;
+          TtarchFileName := FileNames.Strings[i];
+          break;
+        end;
+      end
+
+      {//Check for the specific file
       if UpperCase(FileNames.Strings[i]) = UpperCase(BundleFileName) then
       begin
         result := TTARCH;
         TtarchFileName := FileNames.Strings[i];
         Exit;
-      end
-    end;
-
-    {**** Ttarch2 bundles if they've used open folder and no game specified****}
-    {
-    Edge case - they've used 'open folder' to manually choose a game. They've
-    chosen a folder with one of the new .ttarch2 games in it - so we dont know
-    what specific episode they actually want from that folder.
-    Hack for now - just choose the first recognised bundle in that folder
-    THIS IS AN AWFUL HACK - FIX THIS
-    Having to remember to add new constants to the stringlist below is particularly bad
-    }
-    SpecificBundleNames := TStringList.Create;
-    try
-      SpecificBundleNames.Add(WolfEP1_VoiceBundle);
-      SpecificBundleNames.Add(WolfEP2_VoiceBundle);
-      SpecificBundleNames.Add(WolfEP3_VoiceBundle);
-      SpecificBundleNames.Add(WolfEP4_VoiceBundle);
-      SpecificBundleNames.Add(WolfEP5_VoiceBundle);
-      SpecificBundleNames.Add(WalkingDeadS2_EP1_Bundle);
-      SpecificBundleNames.Add(WalkingDeadS2_EP2_Bundle);
-      SpecificBundleNames.Add(WalkingDeadS2_EP3_Bundle);
-      SpecificBundleNames.Add(WalkingDeadS2_EP4_Bundle);
-      SpecificBundleNames.Add(WalkingDeadS2_EP5_Bundle);
-
-      for j := 0 to SpecificBundleNames.Count - 1 do
-      begin
-        ListFilesInDirByExt(Folder, '.ttarch2', FileNames);
-        for I := 0 to FileNames.Count - 1 do
-        begin
-          //Check for the specific file
-          if UpperCase(FileNames.Strings[i]) = UpperCase(SpecificBundleNames[j]) then
-          begin
-            result := TTARCH;
-            TtarchFileName := FileNames.Strings[i];
-            Exit;
-          end
-        end;
-      end;
-
-    finally
-      SpecificBundleNames.Free;
+      end }
     end;
 
   finally

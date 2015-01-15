@@ -31,7 +31,8 @@ type
     function GetAnnotation_AudioLength(Index: integer): string;
     function GetAnnotation_Category(Index: integer): string;
   public
-    constructor Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame);
+    constructor Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame); overload;
+    constructor Create(AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame; TtarchFile: string); overload;
     destructor Destroy; override;
     {$ifdef DEBUGMODE}
       function Debug_GenerateVoxInfoString(Index: integer): string;
@@ -57,7 +58,7 @@ type
 
 implementation
 
-
+//Normal constructor  - search a directory for voice files and determine the resource format
 constructor TExplorerBaseDumper.Create(FilesFolder, AnnotationFolder: string; Debug: TDebugEvent; TheGame: TTelltaleGame);
 var
   ResourceFormat: TAudioResFormat;
@@ -75,10 +76,29 @@ begin
       TTARCH: BundleReader := TBundledManager.Create(FSourceFolder + TtarchFileName);
       NOT_FOUND: raise EBundleReaderException.Create('No speech files found in the specified folder!');
     end;
+  except
+    on E: EBundleReaderException do
+      raise;
+    on E: EResourceDetectorError do
+      raise;
+  end;
+
+end;
+
+// For 'open file' - open a specific ttarch/ttarch2 bundle
+constructor TExplorerBaseDumper.Create(AnnotationFolder: string;
+  Debug: TDebugEvent; TheGame: TTelltaleGame; TtarchFile: string);
+begin
+  OnDebug:=Debug;
+  FSourceFolder:='';
+  FAnnotationsFolder:=AnnotationFolder;
+
+  try
+    //Only ttarch/ttarch2 files supported for opening individual file
+    BundleReader := TBundledManager.Create(TtarchFile);
   except on E: EBundleReaderException do
     raise;
   end;
-
 end;
 
 destructor TExplorerBaseDumper.Destroy;

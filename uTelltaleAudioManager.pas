@@ -22,6 +22,7 @@ type
     FT_SPEEX_V2,
     FT_OGG,
     FT_FSB,
+    FT_WAV,
     FT_UNKNOWN
   );
 
@@ -38,10 +39,13 @@ type
     function SaveOggToStream(DestStream: TStream): boolean;
     function SaveVoxToStream(AStream: TStream): boolean;
     function SaveFSBToStream(DestStream: TMemoryStream): boolean;
+    function SaveWavToStream(DestStream: TStream): boolean;
     function FindFileHeader(SearchStream: TStream; StartSearchAt, EndSearchAt: Integer; Header: string): integer;
     function DecodeToWav(Source: TMemoryStream; Dest: TStream): boolean;
     function EncodeToOgg(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
     function EncodeToMP3(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
+    function ExtractFSB4(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
+    function ExtractFSB5(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
     procedure AddOggTagsToFile(FileName, Title, Artist, Album, Year: string);
     procedure AddID3V2TagsToMP3(Stream: TStream; Title, Artist, Album, Year: string);
     procedure Log(Text: string);
@@ -49,6 +53,7 @@ type
     procedure GetVOXInfo(Stream: TStream; var NoChannels: integer; var WavSampleRate: integer);
     procedure CheckVoxEncryption(TestData: TStream);
     procedure DecryptVoxPacketAndWriteToByteArray(Source: TStream; var Dest: array of byte; PacketSize, IndexInDest: integer);
+    procedure SaveFixedMP3Stream(InStream, OutStream: TStream; FileSize, Channels: integer);
   public
     constructor Create;
     destructor Destroy; override;
@@ -61,8 +66,8 @@ type
   end;
 
 const
-  strTag_OGGComments = '-c "Comment=Created with Telltale Speech Extractor. Http://quick.mixnmojo.com" -c "Album Artist=Telltale Games" -c "Genre=Game"';
-  strTag_MP3Comments = 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com';
+  strTag_OGGComments = '-c "Comment=Created with Telltale Speech Extractor. Http://quickandeasysoftware.net" -c "Album Artist=Telltale Games" -c "Genre=Game"';
+  strTag_MP3Comments = 'Created with Telltale Speech Extractor. Http://quickandeasysoftware.net';
   EncryptionKeys: array[0..11] of string =(
     '34246C3343726C7564326553576945324F6163396C7574786C3732522D2A384931714F346F616A6C5F24652369616370342A75466C6530', //generic old key
     '92CA9A8185E46473A3BFD6D17FC6CB88995B80D8AAC297E79651A0A89AD9AE95D7766280B4C4A6B9D6ECA99C6885B3DC92C49E64A0A392', //culture shock
@@ -202,9 +207,15 @@ begin
   SetLength(Header, 4);
   fAudioFile.Read(Header[1], 4);
 
-  if Header='FSB4' then
+  if (Header='FSB4') or (Header='FSB5') then
   begin
     fFileType:=FT_FSB;
+    Exit;
+  end;
+
+  if Header='RIFF' then
+  begin
+    fFileType:=FT_WAV;
     Exit;
   end;
 
@@ -625,6 +636,7 @@ begin
       FT_SPEEX_V2: DestFormat := WAV;
       FT_OGG:      DestFormat := OGG;
       FT_FSB:      DestFormat := MP3;
+      FT_WAV:      DestFormat := WAV;
     end;
   end;
 
@@ -642,6 +654,7 @@ begin
       FT_SPEEX_V2: DecodeResult := SaveVoxToStream(TempStream);
       FT_OGG:      DecodeResult := SaveOggToStream(TempStream);
       FT_FSB:      DecodeResult := SaveFSBToStream(TempStream);
+      FT_WAV:      DecodeResult := SaveWAVToStream(TempStream);
     end;
 
     if DecodeResult = false then
@@ -653,7 +666,7 @@ begin
     TempStream.Position := 0;
 
     //This is encoded directly to file without filestream so do this first
-    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_FSB) then
+    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_FSB) or (fFileType = FT_WAV) then
     if (DestFormat = OGG) then
     begin
       //Build a command string for adding the tags when encoding
@@ -663,7 +676,7 @@ begin
       Exit;
     end;
 
-    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_OGG) then
+    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_OGG) or (fFileType = FT_WAV) then
     if (DestFormat = MP3) then
     begin
       //Build a command string for adding the tags when encoding
@@ -699,6 +712,12 @@ begin
         Exit;
       end;
 
+      if (fFileType = FT_WAV) and (DestFormat = WAV) then
+      begin
+        SaveFile.CopyFrom(TempStream, TempStream.Size);
+        Exit;
+      end;
+
       {Now do conversions}
       if (fFileType = FT_OGG) and (DestFormat = WAV) then
       begin
@@ -725,9 +744,7 @@ end;
 
 function TTelltaleAudioManager.SaveFSBToStream(DestStream: TMemoryStream): boolean;
 var
-  TempInt: Integer;
-  buffer: TBuffer;
-  tmpMpegHeader: TMpegHeader;
+  Header: Integer;
 begin
   Result:=false;
   if fAudioFile = nil then exit;
@@ -735,48 +752,252 @@ begin
   fAudioFile.Position := 0;
   DestStream.Position := 0;
 
-  fAudioFile.Read(TempInt, 4);
-  if TempInt <> 876761926 then //'FSB4'
+  fAudioFile.Read(Header, 4);
+  {if (Header <> 876761926) and (Header <> 893539142) then //'FSB4' 'FSB5'
   begin
-    Log( 'Not a FSB4 header!');
+    Log( 'Not a FSB header!' );
     Exit;
-  end;
+  end;}
 
-  fAudioFile.Read(TempInt, 4);
-  if TempInt <> 1 then //Number of samples
+  fAudioFile.Position := 0;
+
+  if Header = 876761926 then
+    Result := ExtractFSB4(fAudioFile, DestStream, '')
+  else
+  if Header = 893539142 then
+    Result := ExtractFSB5(fAudioFile, DestStream, '')
+  else
   begin
-    Log( 'Not just 1 sample in FSB! ' + inttostr(TempInt));
-    Exit;
+    Log('No FSB headers found!');
+    exit;
   end;
+end;
 
-  fAudioFile.Read(TempInt, 4); //Size of sample header
-  fAudioFile.Seek(36 + TempInt, soFromCurrent); //Puts it at start of sample data
 
-  try
-    //Now parse the MP3
-    while fAudioFile.Position < fAudioFile.Size do
-    begin
-      setlength(buffer, 4);
-      TempInt := fAudioFile.Read(buffer[0], 4);  //Bytes read
-      if TempInt < 4 then exit;
+function ShouldDownmixChannels(Channels, Frame: integer): boolean;
+var
+	ChansResult: integer;
+begin
+	if (Channels and 1) = 1 then
+		ChansResult := Channels
+	else
+		ChansResult := Channels div 2;
 
-      tmpMpegHeader := GetValidatedHeader(buffer, 0);
-      if tmpMpegHeader.valid then
+	ChansResult := frame mod ChansResult;
+
+	if (Channels <= 2) or (ChansResult = 0) then
+		result := true
+	else
+		result := false;
+end;
+
+procedure TTelltaleAudioManager.SaveFixedMP3Stream(InStream, OutStream: TStream; FileSize, Channels: integer);
+var
+	Frame, FrameSize, n: integer;
+  Buffer: TBuffer;
+	TempBuffer: TBuffer;
+	tmpMpegHeader: TMpegHeader;
+	TempByte: Byte;
+begin
+	Frame := 0;
+	while FileSize > 0 do
+	begin
+    SetLength(buffer, 3);
+		if InStream.Read(Buffer[0], 3) <> 3 then  //bytes read
+			break;
+
+		Dec(FileSize, 3);
+		FrameSize := 0;
+    //read 3 bytes, if invalid header then read another and shuffle the bytes up in the buffer and check again.
+		while FileSize > 0 do
+		begin
+      tmpMpegHeader := GetValidatedHeader(Buffer, 0);
+		  FrameSize := tmpMpegHeader.framelength;
+      if tmpMpegHeader.valid = true then
+        if FrameSize > 0 then break;
+
+      if InStream.Size - InStream.Position < 1 then //Just in case
       begin
-        fAudioFile.Seek( -4, soFromCurrent);
-        if tmpMpegHeader.framelength + fAudioFile.Position > fAudioFile.Size then
-          exit //Bad frame at the end, dont copy it
-        else
-          DestStream.CopyFrom(fAudioFile, tmpMpegHeader.framelength);
-      end
-      else
-        fAudioFile.Position := fAudioFile.Position -3;
+        Log('Tried to read beyond stream in SaveFixedMP3Stream()');
+        exit;
+      end;
+      InStream.Read(TempByte, 1);
 
+		  Dec(FileSize, 1);
+
+		  Buffer[0] := Buffer[1];
+		  Buffer[1] := Buffer[2];
+		  Buffer[2] := tempbyte;
+		end;
+
+		if FileSize < 0 then break;
+
+		dec(FrameSize, 3);
+
+		if ShouldDownmixChannels(Channels, Frame) then
+      Outstream.Write(Buffer[0], 3);
+
+    if FrameSize > 0 then
+    begin
+      SetLength(TempBuffer,FrameSize);
+      n := InStream.Read(TempBuffer[0], FrameSize);
+      dec(FileSize, n);
+
+      if ShouldDownmixChannels(Channels, Frame) then
+        OutStream.Write(TempBuffer[0], n);
+
+      if n <> FrameSize then
+        break;
     end;
 
-  finally
-    Result := true;
+		inc(Frame);
+	end;
+end;
+
+
+function TTelltaleAudioManager.ExtractFSB4(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
+type
+  TFSBCodec = (
+    FMOD_SOUND_FORMAT_NONE,             //* Unitialized / unknown. */
+    FMOD_SOUND_FORMAT_PCM8,             //* 8bit integer PCM data. */
+    FMOD_SOUND_FORMAT_PCM16,            //* 16bit integer PCM data. */
+    FMOD_SOUND_FORMAT_PCM24,            //* 24bit integer PCM data. */
+    FMOD_SOUND_FORMAT_PCM32,            //* 32bit integer PCM data. */
+    FMOD_SOUND_FORMAT_PCMFLOAT,         //* 32bit floating point PCM data. */
+    FMOD_SOUND_FORMAT_GCADPCM,          //* Compressed Nintendo 3DS/Wii DSP data. */
+    FMOD_SOUND_FORMAT_IMAADPCM,         //* Compressed IMA ADPCM data. */
+    FMOD_SOUND_FORMAT_VAG,              //* Compressed PlayStation Portable ADPCM data. */
+    FMOD_SOUND_FORMAT_HEVAG,            //* Compressed PSVita ADPCM data. */
+    FMOD_SOUND_FORMAT_XMA,              //* Compressed Xbox360 XMA data. */
+    FMOD_SOUND_FORMAT_MPEG,             //* Compressed MPEG layer 2 or 3 data. */
+    FMOD_SOUND_FORMAT_CELT,             //* Compressed CELT data. */
+    FMOD_SOUND_FORMAT_AT9,              //* Compressed PSVita ATRAC9 data. */
+    FMOD_SOUND_FORMAT_XWMA,             //* Compressed Xbox360 xWMA data. */
+    FMOD_SOUND_FORMAT_VORBIS           //* Compressed Vorbis data. */
+    );
+const
+  FSB_FileNameLength: integer = 30;
+  FSOUND_DELTA = $00000200;
+  FSOUND_8BITS = $00000008;
+  FSOUND_16BITS = $00000010;
+  FSOUND_MONO = $00000020;
+  FSOUND_STEREO = $00000040;
+var
+  Channels: Integer;
+  Codec: TFSBCodec;
+  TempDWord, TempInt, Mode: DWord;
+  RecordSize: Word;
+begin
+{
+    char        id[4];      /* 'FSB4' */
+    int32_t     numsamples; /* number of samples in the file */
+    int32_t     shdrsize;   /* size in bytes of all of the sample headers including extended information */
+    int32_t     datasize;   /* size in bytes of compressed sample data */
+    uint32_t    version;    /* extended fsb version */
+    uint32_t    mode;       /* flags that apply to all samples in the fsb */
+    char        zero[8];    /* ??? */
+    uint8_t     hash[16];   /* hash??? */
+}
+  Result := false;
+
+  SourceStream.Position := 0;
+  DestStream.Position := 0;
+
+  SourceStream.Read(TempDWord, 4);
+  if TempDWord <> 876761926 then //'FSB4'
+  begin
+    //Log( 'Not a FSB4 header! in FileNo ' + inttostr(FileNo));
+    Exit;
   end;
+
+  SourceStream.Read(TempInt, 4);
+  if TempInt <> 1 then //Number of samples
+  begin
+    Log( 'Not just 1 sample in FSB! ' + inttostr(TempInt) + ' on file ' + ExtractFileName(DestFile));  //All games so far have a separate fsb for each sound with 1 sample in the file
+    Exit;
+  end;
+
+  SourceStream.Seek(40, soFromCurrent); //Now at start of sample header
+  SourceStream.Read(RecordSize, 2);     //size of this record, inclusive
+  SourceStream.Seek(FSB_FileNameLength, soFromCurrent); //Filename
+  SourceStream.Seek(16, soFromCurrent);
+  SourceStream.Read(Mode, 4);
+  SourceStream.Seek(28, soFromCurrent);
+  if RecordSize > 80 then //Some files have extra data
+    SourceStream.Seek(RecordSize - 80, soFromCurrent);
+
+  //Now work out the codec it uses - so far its always MPEG
+  Codec := FMOD_SOUND_FORMAT_PCM16;
+  if (Mode and FSOUND_DELTA) <> 0 then
+    Codec := FMOD_SOUND_FORMAT_MPEG
+  else
+  if ((Mode and FSOUND_8BITS) <> 0) and (Codec = FMOD_SOUND_FORMAT_PCM16) then
+    Codec := FMOD_SOUND_FORMAT_PCM8;
+
+  //Get no of channels
+  Channels := 1;
+  if (Mode and FSOUND_MONO) <> 0 then
+    Channels := 1
+  else
+  if (Mode and FSOUND_STEREO) <> 0 then
+    Channels := 2;
+
+  if Codec = FMOD_SOUND_FORMAT_MPEG then //fix broken mp3's
+    SaveFixedMP3Stream(SourceStream, DestStream, SourceStream.Size - SourceStream.Position, Channels)
+  else
+    DestStream.CopyFrom(SourceStream, SourceStream.Size - SourceStream.Position);
+
+  Result := true;
+end;
+
+function TTelltaleAudioManager.ExtractFSB5(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
+var
+  TempInt, FileOffset: integer;
+  Offset, TheType: cardinal;
+  Channels: Word;
+  TempDWord, TempDWord2: DWord;
+begin
+  Result := false;
+
+  SourceStream.Position := 0;
+  DestStream.Position := 0;
+
+  SourceStream.Read(TempDWord, 4);
+  if TempDWord <> 893539142 then //'FSB5'
+  begin
+    //Log( 'Not a FSB5 header! in FileNo ' + inttostr(FileNo));
+    Exit;
+  end;
+
+
+  SourceStream.Seek(4, soFromCurrent);
+
+  SourceStream.Read(TempInt, 4);
+  if TempInt <> 1 then //Number of samples
+  begin
+    Log('Not just 1 sample in FSB! ' + inttostr(TempInt) + ' on file ' + ExtractFileName(DestFile));  //All games so far have a separate fsb for each sound with 1 sample in the file
+    Exit;
+  end;
+
+  SourceStream.Read(TempDWord, 4);
+  SourceStream.Read(TempDWord2, 4);
+  FileOffset := TempDWord + TempDWord2 + 60;
+
+  SourceStream.Seek(40, sofromcurrent); //now at end of file header
+
+  SourceStream.Read(Offset, 4);
+  SourceStream.Seek(4, sofromcurrent); //samples
+  TheType := Offset and ((1 shl 7) -1);
+  SourceStream.Seek(4, sofromcurrent); //offset again
+  Channels := (TheType shr 5) + 1;
+
+
+  SourceStream.Seek(FileOffset, soFromBeginning); //Now at start of data???
+
+  //Assume its mp3 - so far everything is
+  SaveFixedMP3Stream(SourceStream, DestStream, SourceStream.Size - SourceStream.Position, Channels);
+
+  Result := true;
 end;
 
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;
@@ -794,6 +1015,16 @@ begin
   finally
     WaveStream.Free;
   end;
+end;
+
+function TTelltaleAudioManager.SaveWavToStream(DestStream: TStream): boolean;
+begin
+  Result:=false;
+  if fAudioFile = nil then exit;
+
+  fAudioFile.Position := 0;
+  DestStream.CopyFrom(fAudioFile, fAudioFile.Size - fAudioFile.Position);
+  Result:=true;
 end;
 
 function TTelltaleAudioManager.SaveOggToStream(DestStream: Tstream): boolean;
@@ -866,6 +1097,7 @@ begin
       FT_SPEEX_V2: DecodeResult := SaveVoxToStream(TempStream);
       FT_OGG:      DecodeResult := SaveOggToStream(TempStream);
       FT_FSB:      DecodeResult := SaveFSBToStream(TempStream);
+      FT_WAV:      DecodeResult := SaveWAVToStream(TempStream);
     end;
 
     if DecodeResult = false then
