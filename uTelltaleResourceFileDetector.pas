@@ -49,6 +49,11 @@ const
   GameOfThronesEP4_Bundle = 'GameOfThrones_pc_GameOfThrones104_voice.ttarch2';
   GameOfThronesEP5_Bundle = 'GameOfThrones_pc_GameOfThrones105_voice.ttarch2';
   GameOfThronesEP6_Bundle = 'GameOfThrones_pc_GameOfThrones106_voice.ttarch2';
+  MinecraftEP1_Bundle = 'MCSM_pc_Minecraft101_voice.ttarch2';
+  MinecraftEP2_Bundle = 'MCSM_pc_Minecraft102_voice.ttarch2';
+  MinecraftEP3_Bundle = 'MCSM_pc_Minecraft103_voice.ttarch2';
+  MinecraftEP4_Bundle = 'MCSM_pc_Minecraft104_voice.ttarch2';
+  MinecraftEP5_Bundle = 'MCSM_pc_Minecraft105_voice.ttarch2';
 var
   FileNames: TStringList;
   i: integer;
@@ -127,6 +132,11 @@ begin
       GameOfThrones_SonsOfWinter:                 BundleFileName := GameOfThronesEP4_Bundle;
       GameOfThrones_ANestOfVipers:                BundleFileName := GameOfThronesEP5_Bundle;
       GameOfThrones_TheIceDragon:                 BundleFileName := GameOfThronesEP6_Bundle;
+      Minecraft_TheOrderoftheStone:               BundleFilename := MinecraftEP1_Bundle;
+      Minecraft_AssemblyRequired:                 BundleFilename := MinecraftEP2_Bundle;
+      Minecraft_TheLastPlaceYouLook:              BundleFilename := MinecraftEP3_Bundle;
+      Minecraft_ABlockAndAHardPlace:              BundleFilename := MinecraftEP4_Bundle;
+      Minecraft_OrderUp:                          BundleFilename := MinecraftEP5_Bundle;
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);

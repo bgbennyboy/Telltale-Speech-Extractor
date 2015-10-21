@@ -12,7 +12,7 @@ interface
 
 uses
   Classes, Sysutils, Windows, Forms,
-  Speex, Bass, BassEnc, MP3FileUtils, JCLStrings, fmod, fmodtypes, typinfo,
+  Speex, Bass, BassEnc, MP3FileUtils, JCLStrings, {fmod, fmodtypes,} typinfo,
   uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt,
   uMPEGHeaderCheck, OggVorbisAndOpusTagLibrary;
 

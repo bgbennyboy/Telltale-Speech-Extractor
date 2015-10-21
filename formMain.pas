@@ -173,7 +173,7 @@ type
     Menu_WallaceAndGromit_Muzzled: TMenuItem;
     Menu_WallaceAndGromit_TheBogeyMan: TMenuItem;
     Menu_PokerNight_Inventory_Uncensored: TMenuItem;
-    FileOpenDialogFolder: TFileOpenDialog;
+    dlgModernFolder: TFileOpenDialog;
     OpenDialogFile: TOpenDialog;
     GameOfThrones2: TMenuItem;
     Menu_GameOfThrones_TheIceDragon: TMenuItem;
@@ -182,11 +182,15 @@ type
     Menu_GameOfThrones_TheSwordInTheDarkness: TMenuItem;
     Menu_GameOfThrones_TheLostLords: TMenuItem;
     Menu_GameOfThrones_IronFromIce: TMenuItem;
+    SamandMax1: TMenuItem;
+    MinecraftStoryMode1: TMenuItem;
+    Menu_Minecraft_OrderUp: TMenuItem;
+    Menu_Minecraft_ABlockAndAHardPlace: TMenuItem;
+    Menu_Minecraft_TheLastPlaceYouLook: TMenuItem;
+    Menu_Minecraft_AssemblyRequired: TMenuItem;
+    Menu_Minecraft_TheOrderoftheStone: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
-    procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
-      Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean;
-      var ImageIndex: Integer);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;
       var NodeDataSize: Integer);
     procedure btnSaveSingleAudioClick(Sender: TObject);
@@ -211,6 +215,9 @@ type
     procedure TreeGetText(Sender: TBaseVirtualTree; Node: PVirtualNode;
       Column: TColumnIndex; TextType: TVSTTextType; var CellText: string);
     procedure OpenPopupMenuHandler(Sender: TObject);
+    procedure TreeGetImageIndex(Sender: TBaseVirtualTree; Node: PVirtualNode;
+      Kind: TVTImageKind; Column: TColumnIndex; var Ghosted: Boolean;
+      var ImageIndex: TImageIndex);
   private
     fChosenGame: TTelltaleGame;
     SpeechExtractor: TExplorerBaseDumper;
@@ -576,16 +583,32 @@ var
   VisibleArray: array of integer;
   i: integer;
   TheNode, tempnode: pvirtualnode;
+  strFolder: string;
 begin
   if Tree.RootNodeCount=0 then exit;
-  if dlgBrowseforSaveFolder.Execute = false then exit;
+
+  strFolder := '';
+  if Win32MajorVersion >= 6 then //Vista and above
+  begin
+    dlgModernFolder.Title := strChooseSaveFolder;
+    if dlgModernFolder.Execute then
+      strFolder := dlgModernFolder.FileName;
+  end
+  else
+  begin
+    dlgBrowseForOpenFolder.Title := strChooseSaveFolder;
+    if dlgBrowseForOpenFolder.Execute then
+      strFolder := dlgBrowseForOpenFolder.Directory;
+  end;
+
+  if strFolder = '' then exit;
 
   EnableDisableButtonsGlobal(false);
   try
     if OnlySaveVisible=false then
     begin
       DoLog(strSavingAllAudio);
-      SpeechExtractor.SaveAllAudioFiles(dlgBrowseForSaveFolder.Directory, SaveAs);
+      SpeechExtractor.SaveAllAudioFiles(strFolder, SaveAs);
     end
     else
     begin
@@ -607,7 +630,7 @@ begin
         VisibleArray[i]:=TheNode.Index;
       end;
 
-      SpeechExtractor.SaveSpecifiedAudioFiles(dlgBrowseForSaveFolder.Directory, VisibleArray, SaveAs);
+      SpeechExtractor.SaveSpecifiedAudioFiles(strFolder, VisibleArray, SaveAs);
       VisibleArray := nil;
     end;
   finally
@@ -808,16 +831,6 @@ begin
   end;
 end;
 
-procedure TfrmMain.TreeGetImageIndex(Sender: TBaseVirtualTree;
-  Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
-  var Ghosted: Boolean; var ImageIndex: Integer);
-begin
-  if column <> 0 then exit;
-  if Kind = ikOverlay then exit;
-
-  if column=0 then
-    ImageIndex:=5;
-end;
 
 procedure TfrmMain.TreeKeyPress(Sender: TObject; var Key: Char);
 begin
@@ -825,6 +838,17 @@ begin
 
   if key = #13 then
     btnPlaySound.Click;
+end;
+
+procedure TfrmMain.TreeGetImageIndex(Sender: TBaseVirtualTree;
+  Node: PVirtualNode; Kind: TVTImageKind; Column: TColumnIndex;
+  var Ghosted: Boolean; var ImageIndex: TImageIndex);
+begin
+  if column <> 0 then exit;
+  if Kind = ikOverlay then exit;
+
+  if column=0 then
+    ImageIndex:=5;
 end;
 
 procedure TfrmMain.TreeGetNodeDataSize(Sender: TBaseVirtualTree;
@@ -992,9 +1016,9 @@ begin
   begin
     if Win32MajorVersion >= 6 then //Vista and above
     begin
-      FileOpenDialogFolder.Title := strOpenDialogTitle;
-      if FileOpenDialogFolder.Execute then
-        strFolder := FileOpenDialogFolder.FileName;
+      dlgModernFolder.Title := strOpenDialogTitle;
+      if dlgModernFolder.Execute then
+        strFolder := dlgModernFolder.FileName;
     end
     else
     begin
@@ -1009,7 +1033,7 @@ begin
     strFolder:=GetTelltaleGamePath(CSI_DeadlyIntent);
 
     dlgBrowseForOpenFolder.Directory := strFolder;
-    FileOpenDialogFolder.DefaultFolder := strFolder;
+    dlgModernFolder.DefaultFolder := strFolder;
 
     MessageDlg(strCSIDeadlyIntent, mtInformation, [mbOk], 0);
   end
@@ -1019,7 +1043,7 @@ begin
     strFolder:=GetTelltaleGamePath(CSI_FatalConspiracy);
 
     dlgBrowseForOpenFolder.Directory := strFolder;
-    FileOpenDialogFolder.DefaultFolder := strFolder;
+    dlgModernFolder.DefaultFolder := strFolder;
 
     MessageDlg(strCSIFatalConspiracy, mtInformation, [mbOk], 0);
   end

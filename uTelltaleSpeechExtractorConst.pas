@@ -12,7 +12,7 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.3.8';
+  strAppVersion:         string = '1.3.9';
   strAppTitle:           string = 'Telltale Speech Extractor';
   strAppURL:             string = 'http://quickandeasysoftware.net';
   
@@ -33,6 +33,7 @@ const
   strAddNewCategory:        string = 'Add new category';
   strCategoryName:          string = 'Category name';
   strMissingMenu:           string =  'Menu missing for game! Report this.';
+  strChooseSaveFolder:      string = 'Choose a folder';
   strOpenDialogTitle: string = 'Choose a folder with .aud .ttarch  or .ttarch2 files';
   strCSIFatalConspiracy: string = 'CSI Fatal Conspiracy has the music for each of its 5 parts stored in separate folders. ' +
                                   'You''ll need to dump the music from each part manually.' + #13#13 +

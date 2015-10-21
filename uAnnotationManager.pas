@@ -147,7 +147,7 @@ begin
         inc(FoundCount);
   end;
 
-  if FoundCount=3 then
+  if FoundCount>=3 then
     result:=true
   else
     result:=false;
