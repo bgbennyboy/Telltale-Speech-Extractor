@@ -32,6 +32,7 @@ interface
 uses
   Windows, Messages, SysUtils, Classes, Graphics, Controls, Forms,
   Dialogs, StdCtrls, ImgList, ComCtrls, ExtCtrls, Menus, TypInfo, System.UITypes,
+  StrUtils,
 
   JvMenus, JvBaseDlg, JvBrowseFolder, JvExStdCtrls, JvRichEdit, JvExExtCtrls,
   JvExtComponent, JvPanel, JvEdit, JvHtControls,
@@ -183,12 +184,19 @@ type
     Menu_GameOfThrones_TheLostLords: TMenuItem;
     Menu_GameOfThrones_IronFromIce: TMenuItem;
     SamandMax1: TMenuItem;
-    MinecraftStoryMode1: TMenuItem;
+    MinecraftStoryMode2: TMenuItem;
+    Menu_Minecraft_AJourneysEnd: TMenuItem;
+    Menu_Minecraft_AccessDenied: TMenuItem;
+    Menu_Minecraft_APortalToMystery: TMenuItem;
     Menu_Minecraft_OrderUp: TMenuItem;
     Menu_Minecraft_ABlockAndAHardPlace: TMenuItem;
     Menu_Minecraft_TheLastPlaceYouLook: TMenuItem;
     Menu_Minecraft_AssemblyRequired: TMenuItem;
     Menu_Minecraft_TheOrderoftheStone: TMenuItem;
+    Michonne1: TMenuItem;
+    Menu_WalkingDead_Michonne_WhatWeDeserve: TMenuItem;
+    Menu_WalkingDead_Michonne_GiveNoShelter: TMenuItem;
+    Menu_WalkingDead_Michonne_InTooDeep: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;
@@ -374,6 +382,20 @@ begin
       SpeechExtractor.ParseFiles;
       Tree.Header.AutoFitColumns(true);
       AddFilterPopupItems;
+
+      //HACK - tell user that other files contain speech for Minecraft
+      if FileExists(FileOrFolder) then //Single file
+      begin
+        if ContainsText( ExtractFileName(FileOrFolder), 'minecraft') then
+          MessageDlg(strMinecraftJesseMsg, mtInformation, [mbOk], 0);
+      end
+      else //Folder mode
+      begin
+        if ContainsText( GetENumName(TypeInfo(TTelltaleGame), ord(fChosenGame)) , 'minecraft') then
+          MessageDlg(strMinecraftJesseMsg, mtInformation, [mbOk], 0);
+      end;
+
+
     finally
       EnableDisableButtonsGlobal(true);
     end;

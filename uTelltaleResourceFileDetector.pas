@@ -49,11 +49,18 @@ const
   GameOfThronesEP4_Bundle = 'GameOfThrones_pc_GameOfThrones104_voice.ttarch2';
   GameOfThronesEP5_Bundle = 'GameOfThrones_pc_GameOfThrones105_voice.ttarch2';
   GameOfThronesEP6_Bundle = 'GameOfThrones_pc_GameOfThrones106_voice.ttarch2';
+  WalkingDeadMichonne_EP1_Bundle = 'WDM_pc_WalkingDeadM101_voice.ttarch2';
+  WalkingDeadMichonne_EP2_Bundle = 'WDM_pc_WalkingDeadM102_voice.ttarch2';
+  WalkingDeadMichonne_EP3_Bundle = 'WDM_pc_WalkingDeadM103_voice.ttarch2';
   MinecraftEP1_Bundle = 'MCSM_pc_Minecraft101_voice.ttarch2';
   MinecraftEP2_Bundle = 'MCSM_pc_Minecraft102_voice.ttarch2';
   MinecraftEP3_Bundle = 'MCSM_pc_Minecraft103_voice.ttarch2';
   MinecraftEP4_Bundle = 'MCSM_pc_Minecraft104_voice.ttarch2';
   MinecraftEP5_Bundle = 'MCSM_pc_Minecraft105_voice.ttarch2';
+  MinecraftEP6_Bundle = 'MCSM_pc_Minecraft106_voice.ttarch2';
+  MinecraftEP7_Bundle = 'MCSM_pc_Minecraft107_voice.ttarch2';
+  MinecraftEP8_Bundle = 'MCSM_pc_Minecraft108_voice.ttarch2';
+
 var
   FileNames: TStringList;
   i: integer;
@@ -137,6 +144,12 @@ begin
       Minecraft_TheLastPlaceYouLook:              BundleFilename := MinecraftEP3_Bundle;
       Minecraft_ABlockAndAHardPlace:              BundleFilename := MinecraftEP4_Bundle;
       Minecraft_OrderUp:                          BundleFilename := MinecraftEP5_Bundle;
+      Minecraft_APortalToMystery:                 BundleFileName := MinecraftEP6_Bundle;
+      Minecraft_AccessDenied:                     BundleFileName := MinecraftEP7_Bundle;
+      Minecraft_AJourneysEnd:                     BundleFileName := MinecraftEP8_Bundle; //unreleased
+      WalkingDead_Michonne_InTooDeep:             BundleFileName := WalkingDeadMichonne_EP1_Bundle;
+      WalkingDead_Michonne_GiveNoShelter:         BundleFileName := WalkingDeadMichonne_EP2_Bundle;
+      WalkingDead_Michonne_WhatWeDeserve:         BundleFileName := WalkingDeadMichonne_EP3_Bundle;
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);

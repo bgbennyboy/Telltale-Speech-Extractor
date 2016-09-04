@@ -12,7 +12,7 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.3.9';
+  strAppVersion:         string = '1.3.10';
   strAppTitle:           string = 'Telltale Speech Extractor';
   strAppURL:             string = 'http://quickandeasysoftware.net';
   
@@ -51,6 +51,10 @@ const
                                     'There are two possible solutions to this:' + #13#13 +
                                     'Select an episode from the menu and the program will automatically find the files for that episode. Or...' + #13#13 +
                                     'Choose "Open file" and select the exact file that you want to extract voices from.';
+
+  strMinecraftJesseMsg:   string = 'Some speech files for Minecraft are also in the MCSM_pc_JesseMale files so you''ll need to look in these too.' + #13#13 +
+                                   'The filenames are slightly different for each episode but they always begin with MCSM_pc_JesseMale101.' + #13#13 +
+                                   'For example in episode 1 its "MCSM_pc_JesseMale101_all" and in episode 2 its "MCSM_pc_JesseMale102_uncompressed"';
 
 
 implementation

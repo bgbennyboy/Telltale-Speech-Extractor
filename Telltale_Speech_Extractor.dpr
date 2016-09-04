@@ -49,7 +49,7 @@ begin
   else
   if FileExists(extractfilepath(application.ExeName)+ '\' + 'lame.exe') = false then
   begin
-    ShowMessage('oggenc.exe not found!' + #13 +  'It should be located in the same folder as this program.'
+    ShowMessage('lame.exe not found!' + #13 +  'It should be located in the same folder as this program.'
      + #13 + #13 + 'The program will now exit.');
   end
   else
