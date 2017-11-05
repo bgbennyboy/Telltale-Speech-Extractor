@@ -8,6 +8,8 @@
 
 program Telltale_Speech_Extractor;
 
+{$R *.dres}
+
 uses
   Forms,
   sysutils,
@@ -26,7 +28,8 @@ uses
   uTelltaleSpeechExtractorConst in 'uTelltaleSpeechExtractorConst.pas',
   Mp3FileUtils in 'mp3fileutils_06a\Mp3FileUtils.pas',
   U_CharCode in 'mp3fileutils_06a\U_CharCode.pas',
-  Id3v2Frames in 'mp3fileutils_06a\Id3v2Frames.pas';
+  Id3v2Frames in 'mp3fileutils_06a\Id3v2Frames.pas',
+  uEmbeddedResFileManager in 'uEmbeddedResFileManager.pas';
 
 {$R *.res}
 

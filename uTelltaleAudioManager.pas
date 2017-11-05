@@ -12,8 +12,8 @@ interface
 
 uses
   Classes, Sysutils, Windows, Forms,
-  Speex, Bass, BassEnc, MP3FileUtils, JCLStrings, {fmod, fmodtypes,} typinfo,
-  uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt,
+  Speex, Bass, BassEnc, MP3FileUtils, JCLStrings, JCLShell,{fmod, fmodtypes,} typinfo,
+  uWaveWriter, uExplorerTypes, uTelltaleAudioPlayback, uTelltaleDecrypt, uEmbeddedResFileManager,
   uMPEGHeaderCheck, OggVorbisAndOpusTagLibrary;
 
 type
@@ -35,6 +35,7 @@ type
     fOnProgress: TProgressEvent;
     fVoxKeyCheckDone: boolean;
     fEncryptionKey: string;
+    fResFileMgr: TEmbeddedResFileManager;
     function DecodeVOXSpeex(Source, Dest: TStream): boolean;
     function SaveOggToStream(DestStream: TStream): boolean;
     function SaveVoxToStream(AStream: TStream): boolean;
@@ -46,6 +47,9 @@ type
     function EncodeToMP3(Source: TMemoryStream; FileName, TagCommandString: string): boolean;
     function ExtractFSB4(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
     function ExtractFSB5(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
+    function DecodeFSBOggToStream(InStream, OutStream: TStream): boolean;
+    function FindFSBFormat: TAudioFormat;
+    function FindFirstFileWithExtensionInDir(Path, FileExt: string): string;
     procedure AddOggTagsToFile(FileName, Title, Artist, Album, Year: string);
     procedure AddID3V2TagsToMP3(Stream: TStream; Title, Artist, Album, Year: string);
     procedure Log(Text: string);
@@ -151,11 +155,16 @@ begin
 
   if Assigned(fOnDebug) then
     fAudioPlayer.OnDebug := fOnDebug;
+
+  fResFileMgr := TEmbeddedResFileManager.Create;
 end;
 
 destructor TTelltaleAudioManager.Destroy;
 begin
   fAudioPlayer.free;
+
+  if fResFileMgr <> nil then
+    fResFileMgr.Free;
 
   inherited;
 end;
@@ -635,7 +644,7 @@ begin
       FT_SPEEX_V1: DestFormat := WAV;
       FT_SPEEX_V2: DestFormat := WAV;
       FT_OGG:      DestFormat := OGG;
-      FT_FSB:      DestFormat := MP3;
+      FT_FSB:      DestFormat := FindFSBFormat; //Usually MP3
       FT_WAV:      DestFormat := WAV;
     end;
   end;
@@ -676,7 +685,7 @@ begin
       Exit;
     end;
 
-    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_OGG) or (fFileType = FT_WAV) then
+    if (fFileType = FT_SPEEX_V1) or (fFileType = FT_SPEEX_V2) or (fFileType = FT_OGG) or (fFileType = FT_WAV) or ((fFileType = FT_FSB) and (FindFSBFormat = WAV))then
     if (DestFormat = MP3) then
     begin
       //Build a command string for adding the tags when encoding
@@ -953,7 +962,7 @@ end;
 function TTelltaleAudioManager.ExtractFSB5(SourceStream: TStream; DestStream: TStream; DestFile: string): boolean;
 var
   TempInt, FileOffset: integer;
-  Offset, TheType: cardinal;
+  Offset, TheType, Flags: cardinal;
   Channels: Word;
   TempDWord, TempDWord2: DWord;
 begin
@@ -981,9 +990,12 @@ begin
 
   SourceStream.Read(TempDWord, 4);
   SourceStream.Read(TempDWord2, 4);
-  FileOffset := TempDWord + TempDWord2 + 60;
+  FileOffset := TempDWord + TempDWord2 + 60; //Header is 60 bytes in total
 
-  SourceStream.Seek(40, sofromcurrent); //now at end of file header
+  SourceStream.Seek(4, sofromcurrent); //sample data size
+  SourceStream.Read(Flags, 4);
+
+  SourceStream.Seek(32, sofromcurrent); //now at end of file header
 
   SourceStream.Read(Offset, 4);
   SourceStream.Seek(4, sofromcurrent); //samples
@@ -994,10 +1006,83 @@ begin
 
   SourceStream.Seek(FileOffset, soFromBeginning); //Now at start of data???
 
-  //Assume its mp3 - so far everything is
-  SaveFixedMP3Stream(SourceStream, DestStream, SourceStream.Size - SourceStream.Position, Channels);
+  //Log(inttostr(flags));
+  if Flags = 15 then //Its OGG
+  begin
+    Result := DecodeFSBOggToStream(SourceStream, DestStream);
+  end
+  else //Assume its mp3 - so far almost everything is  - but really should check for Flags = 11
+  begin
+    SaveFixedMP3Stream(SourceStream, DestStream, SourceStream.Size - SourceStream.Position, Channels);
+    Result := true;
+  end;
+end;
 
-  Result := true;
+//This really isnt great but it works for now
+function TTelltaleAudioManager.DecodeFSBOggToStream(InStream, OutStream: TStream): boolean;
+var
+  TempFile: TFileStream;
+  CreatedFile, FSBFolder: string;
+begin
+  result := false;
+
+  if InStream.Size = 0 then
+  begin
+    Log('FSB Ogg stream size is 0 !');
+    Exit;
+  end;
+
+  if FileExists( fResFileMgr.FSBExe ) = false then
+  begin
+    Log('Couldnt find custom FSB dumper. This shouldnt happen!');
+    Exit;
+  end;
+
+  FSBFolder := IncludeTrailingPathDelimiter(ExtractFilePath(fResFileMgr.FSBExe));
+
+  try
+    TempFile := TFileStream.Create( FSBFolder + 'tempFSB.fsb', fmCreate );
+    try
+      InStream.Position := 0;
+      TempFile.CopyFrom(InStream, InStream.Size);
+    finally
+      TempFile.Free;
+    end;
+
+  except on EFCreateError do
+    begin
+      Log('Too many decode attempts! Ignoring this playback request');
+      exit;
+    end;
+  end;
+
+
+  if ShellExecAndWait( fResFileMgr.FSBExe, FSBFolder, '', SW_HIDE) then
+  begin
+   //See if its made the wav file (we dont know what the actual name will be)
+    CreatedFile := FindFirstFileWithExtensionInDir(FSBFolder, '.wav');
+
+    if CreatedFile = '' then
+    begin
+      Log('FSB Ogg decode failed!');
+      Exit;
+    end;
+
+
+    //Now load the data back from the decoded file
+    OutStream.Size := 0;
+    TempFile := TFileStream.Create( FSBFolder + CreatedFile, fmOpenRead );
+    try
+      OutStream.CopyFrom(TempFile, TempFile.Size);
+      OutStream.Position := 0;
+      result := true;
+    finally
+      TempFile.Free;
+      SysUtils.DeleteFile( FSBFolder + CreatedFile );
+    end;
+
+  end;
+
 end;
 
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;
@@ -1081,6 +1166,63 @@ begin
 
 end;
 
+function TTelltaleAudioManager.FindFirstFileWithExtensionInDir(Path, FileExt: string): string;
+var
+  SR: TSearchRec;
+begin
+  if length(FileExt) > 1 then
+    if FileExt[1] <> '.' then
+      FileExt := '.' + FileExt;
+
+  if FindFirst(Path + '*.*', faAnyFile, SR) = 0 then
+  begin
+    repeat
+      begin
+        if sr.Attr and faDirectory = faDirectory then
+        else
+        if sr.Attr and faSysFile = faSysFile then
+        else
+        begin
+          if extractfileext(sr.Name)=FileExt then
+          begin
+            result := sr.Name;
+            break;
+          end;
+        end;
+      end;
+    until FindNext(SR) <> 0;
+    Sysutils.FindClose(SR);
+  end;
+end;
+
+//Find out if its stored as an MP3 or OGG
+function TTelltaleAudioManager.FindFSBFormat: TAudioFormat;
+var
+  Header: Integer;
+  Flags: cardinal;
+begin
+  Result := MP3; //If all else fails assume its an MP3 - most are
+  if fAudioFile = nil then exit;
+
+  fAudioFile.Position := 0;
+  fAudioFile.Read(Header, 4);
+
+  if Header = 876761926 then
+    Result := MP3 //FSB4's are older and were all MP3 in the games I've tested
+  else
+  if Header = 893539142 then //FSB5 is usually MP3 but some newer games use OGG
+  begin
+    fAudioFile.Seek(20, soFromCurrent);
+    fAudioFile.Read(Flags, 4);
+    if Flags = 15 then //Its OGG
+      result := WAV
+    else
+      result := MP3; //All others seen are MP3
+  end
+  else
+    Result := MP3; //Assume mp3, it'll catch an invalid FSB later when it tries to dump the FSB
+
+end;
 
 procedure TTelltaleAudioManager.PlayAudio;
 var

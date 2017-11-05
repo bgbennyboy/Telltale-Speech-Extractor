@@ -43,7 +43,8 @@ uses
 
   AdvGlowButton, AdvAppStyler, AdvMenus, AdvMenuStylers, HTMLStatusBar, TaskDialog, AdvPanel,
 
-  uExplorerbaseunit, uExplorertypes, uTelltaleFuncs, uTelltaleSpeechExtractorConst;
+  uExplorerbaseunit, uExplorertypes, uTelltaleFuncs, uTelltaleSpeechExtractorConst,
+  System.ImageList;
 
 type
   TfrmMain = class(TForm)
@@ -197,6 +198,25 @@ type
     Menu_WalkingDead_Michonne_WhatWeDeserve: TMenuItem;
     Menu_WalkingDead_Michonne_GiveNoShelter: TMenuItem;
     Menu_WalkingDead_Michonne_InTooDeep: TMenuItem;
+    SeasonThree1: TMenuItem;
+    Menu_WalkingDead_S3_FromtheGallows: TMenuItem;
+    Menu_WalkingDead_S3_ThickerThanWater: TMenuItem;
+    Menu_WalkingDead_S3_AbovetheLaw: TMenuItem;
+    Menu_WalkingDead_S3_TiesThatBindPartTwo: TMenuItem;
+    Menu_WalkingDead_S3_TiesThatBindPartOne: TMenuItem;
+    Batman1: TMenuItem;
+    BatmanTheEnemyWithin1: TMenuItem;
+    Menu_Batman_SameStitch: TMenuItem;
+    Menu_Batman_WhatAilsYou: TMenuItem;
+    Menu_Batman_FracturedMask: TMenuItem;
+    Menu_Batman_ThePact: TMenuItem;
+    Menu_Batman_TheEnigma: TMenuItem;
+    BatmanTheTelltaleSeries1: TMenuItem;
+    Menu_Batman_CityOfLights: TMenuItem;
+    Menu_Batman_GuardianOfGotham: TMenuItem;
+    Menu_Batman_NewWorldOrder: TMenuItem;
+    Menu_Batman_ChildrenOfArkham: TMenuItem;
+    Menu_Batman_RealmOfShadows: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;
