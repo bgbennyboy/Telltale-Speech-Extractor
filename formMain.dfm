@@ -7650,16 +7650,19 @@ object frmMain: TfrmMain
         end
         object Menu_Batman_FracturedMask: TMenuItem
           Caption = 'Fractured Mask'
+          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
         object Menu_Batman_WhatAilsYou: TMenuItem
           Caption = 'What Ails You'
+          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
         object Menu_Batman_SameStitch: TMenuItem
           Caption = 'Same Stitch'
+          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
@@ -7737,6 +7740,35 @@ object frmMain: TfrmMain
         OnClick = OpenPopupMenuHandler
       end
     end
+    object GuardiansOfTheGalaxy1: TMenuItem
+      Caption = 'Guardians Of The Galaxy'
+      ImageIndex = 19
+      object Menu_Guardians_TangledUpInBlue: TMenuItem
+        Caption = 'Tangled Up in Blue'
+        ImageIndex = 19
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_Guardians_UnderPressure: TMenuItem
+        Caption = 'Under Pressure'
+        ImageIndex = 19
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_Guardians_MoreThanAFeeling: TMenuItem
+        Caption = 'More than a Feeling'
+        ImageIndex = 19
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_Guardians_WhoNeedsYou: TMenuItem
+        Caption = 'Who Needs You'
+        ImageIndex = 19
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_Guardians_DontStopBelievin: TMenuItem
+        Caption = 'Don'#39't Stop Believin'
+        ImageIndex = 19
+        OnClick = OpenPopupMenuHandler
+      end
+    end
     object HectorBadgeOfCarnage1: TMenuItem
       Caption = 'Hector: Badge Of Carnage'
       ImageIndex = 10
@@ -7788,45 +7820,78 @@ object frmMain: TfrmMain
     object MinecraftStoryMode2: TMenuItem
       Caption = 'Minecraft: Story Mode'
       ImageIndex = 18
-      object Menu_Minecraft_TheOrderoftheStone: TMenuItem
-        Caption = 'The Order of the Stone'
+      object Season11: TMenuItem
+        Caption = 'Season 1'
         ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
+        object Menu_Minecraft_TheOrderoftheStone: TMenuItem
+          Caption = 'The Order of the Stone'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_AssemblyRequired: TMenuItem
+          Caption = 'Assembly Required'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_TheLastPlaceYouLook: TMenuItem
+          Caption = 'The Last Place You Look'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_ABlockAndAHardPlace: TMenuItem
+          Caption = 'A Block and a Hard Place'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_OrderUp: TMenuItem
+          Caption = 'Order Up!'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_APortalToMystery: TMenuItem
+          Caption = 'A Portal To Mystery'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_AccessDenied: TMenuItem
+          Caption = 'Access Denied'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_AJourneysEnd: TMenuItem
+          Caption = 'A Journey'#39's End'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
       end
-      object Menu_Minecraft_AssemblyRequired: TMenuItem
-        Caption = 'Assembly Required'
+      object Season21: TMenuItem
+        Caption = 'Season 2'
         ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_TheLastPlaceYouLook: TMenuItem
-        Caption = 'The Last Place You Look'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_ABlockAndAHardPlace: TMenuItem
-        Caption = 'A Block and a Hard Place'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_OrderUp: TMenuItem
-        Caption = 'Order Up!'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_APortalToMystery: TMenuItem
-        Caption = 'A Portal To Mystery'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_AccessDenied: TMenuItem
-        Caption = 'Access Denied'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
-      end
-      object Menu_Minecraft_AJourneysEnd: TMenuItem
-        Caption = 'A Journey'#39's End'
-        ImageIndex = 18
-        OnClick = OpenPopupMenuHandler
+        object Menu_Minecraft_S2_HeroInResidence: TMenuItem
+          Caption = 'Hero in Residence'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_Minecraft_S2_GiantConsequences: TMenuItem
+          Caption = 'Giant Consequences'
+          ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
+        end
+        object Episode31: TMenuItem
+          Caption = 'Episode 3'
+          Enabled = False
+          ImageIndex = 18
+        end
+        object Episode41: TMenuItem
+          Caption = 'Episode 4'
+          Enabled = False
+          ImageIndex = 18
+        end
+        object Episode51: TMenuItem
+          Caption = 'Episode 5'
+          Enabled = False
+          ImageIndex = 18
+        end
       end
     end
     object MenuPoker: TMenuItem

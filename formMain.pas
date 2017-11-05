@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2014 Bennyboy
+  Copyright (c) 2007 - 2017 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }
@@ -217,6 +217,19 @@ type
     Menu_Batman_NewWorldOrder: TMenuItem;
     Menu_Batman_ChildrenOfArkham: TMenuItem;
     Menu_Batman_RealmOfShadows: TMenuItem;
+    Season11: TMenuItem;
+    Season21: TMenuItem;
+    Episode51: TMenuItem;
+    Episode41: TMenuItem;
+    Episode31: TMenuItem;
+    Menu_Minecraft_S2_GiantConsequences: TMenuItem;
+    Menu_Minecraft_S2_HeroInResidence: TMenuItem;
+    GuardiansOfTheGalaxy1: TMenuItem;
+    Menu_Guardians_DontStopBelievin: TMenuItem;
+    Menu_Guardians_WhoNeedsYou: TMenuItem;
+    Menu_Guardians_MoreThanAFeeling: TMenuItem;
+    Menu_Guardians_UnderPressure: TMenuItem;
+    Menu_Guardians_TangledUpInBlue: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;
