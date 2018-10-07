@@ -863,7 +863,7 @@ object frmAbout: TfrmAbout
       ''
       'Simon Boyes - for advice and testing'
       ''
-      'Telltale Games'
+      'All the former staff at Telltale Games'
       'Thanks for making such brilliant games'
       'http://www.telltalegames.com'
       ''

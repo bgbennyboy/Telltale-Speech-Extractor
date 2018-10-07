@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2014 Bgbennyboy
+  Copyright (c) 2007 - 2018 Bgbennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }
@@ -58,7 +58,7 @@ begin
   else
   begin
     Application.CreateForm(TfrmMain, frmMain);
-  Application.CreateForm(TfrmAbout, frmAbout);
-  Application.Run;
+    Application.CreateForm(TfrmAbout, frmAbout);
+    Application.Run;
   end;
 end.

@@ -7650,19 +7650,16 @@ object frmMain: TfrmMain
         end
         object Menu_Batman_FracturedMask: TMenuItem
           Caption = 'Fractured Mask'
-          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
         object Menu_Batman_WhatAilsYou: TMenuItem
           Caption = 'What Ails You'
-          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
         object Menu_Batman_SameStitch: TMenuItem
           Caption = 'Same Stitch'
-          Enabled = False
           ImageIndex = 8
           OnClick = OpenPopupMenuHandler
         end
@@ -7877,20 +7874,20 @@ object frmMain: TfrmMain
           ImageIndex = 18
           OnClick = OpenPopupMenuHandler
         end
-        object Episode31: TMenuItem
-          Caption = 'Episode 3'
-          Enabled = False
+        object Menu_Minecraft_S2_JailhouseBlock: TMenuItem
+          Caption = 'Jailhouse Block'
           ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
         end
-        object Episode41: TMenuItem
-          Caption = 'Episode 4'
-          Enabled = False
+        object Menu_Minecraft_S2_BelowTheBedrock: TMenuItem
+          Caption = 'Below The Bedrock'
           ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
         end
-        object Episode51: TMenuItem
-          Caption = 'Episode 5'
-          Enabled = False
+        object Menu_Minecraft_S2_AboveAndBeyond: TMenuItem
+          Caption = 'Above And Beyond'
           ImageIndex = 18
+          OnClick = OpenPopupMenuHandler
         end
       end
     end
@@ -8225,6 +8222,20 @@ object frmMain: TfrmMain
         end
         object Menu_WalkingDead_S3_FromtheGallows: TMenuItem
           Caption = 'From the Gallows'
+          ImageIndex = 12
+          OnClick = OpenPopupMenuHandler
+        end
+      end
+      object heFinalSeason1: TMenuItem
+        Caption = 'The Final Season'
+        ImageIndex = 12
+        object Menu_WalkingDead_S4_DoneRunning: TMenuItem
+          Caption = 'Done Running'
+          ImageIndex = 12
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_WalkingDead_S4_SufferTheChildren: TMenuItem
+          Caption = 'Suffer The Children'
           ImageIndex = 12
           OnClick = OpenPopupMenuHandler
         end

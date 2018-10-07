@@ -1,20 +1,9 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2017 Bennyboy
+  Copyright (c) 2007 - 2018 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
-}
-
-{
-  BEFORE RELEASE CHECK:
-
-  Include all the dll's and oggenc.exe
-  Include the annotations
-  Change build config from debug to release
-  Compress with upx
-  Disable ReportMemoryLeaksOnShutdown in project source
-  Update readme
 }
 
 {
@@ -219,9 +208,9 @@ type
     Menu_Batman_RealmOfShadows: TMenuItem;
     Season11: TMenuItem;
     Season21: TMenuItem;
-    Episode51: TMenuItem;
-    Episode41: TMenuItem;
-    Episode31: TMenuItem;
+    Menu_Minecraft_S2_AboveAndBeyond: TMenuItem;
+    Menu_Minecraft_S2_BelowTheBedrock: TMenuItem;
+    Menu_Minecraft_S2_JailhouseBlock: TMenuItem;
     Menu_Minecraft_S2_GiantConsequences: TMenuItem;
     Menu_Minecraft_S2_HeroInResidence: TMenuItem;
     GuardiansOfTheGalaxy1: TMenuItem;
@@ -230,6 +219,9 @@ type
     Menu_Guardians_MoreThanAFeeling: TMenuItem;
     Menu_Guardians_UnderPressure: TMenuItem;
     Menu_Guardians_TangledUpInBlue: TMenuItem;
+    heFinalSeason1: TMenuItem;
+    Menu_WalkingDead_S4_DoneRunning: TMenuItem;
+    Menu_WalkingDead_S4_SufferTheChildren: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;

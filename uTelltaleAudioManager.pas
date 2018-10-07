@@ -489,6 +489,12 @@ begin
   Source.Read(ArrayLength, 4); //No of packet records
   StartOfData :=  Source.Size - DataBlockSize;
 
+  //Sanity check and corrections for bloody Atari version of SamNMax - thats the version TT has for download from their site now.
+  //The datablocksize and offset are out by 1 byte
+  if (ArrayLength * 4) + Source.Position <> StartOfData then
+    StartOfData := Source.Position + (ArrayLength * 4);
+
+
   SetLength(SizesArray, ArrayLength);
   //Packet size records
   for I := 0 to ArrayLength - 1 do
@@ -637,7 +643,7 @@ begin
   if fAudioFile = nil then exit;
   AddOggTagsWhenSaved := false;
 
-  //Choose the most suitible output format
+  //Choose the most suitable output format
   if DestFormat = AUTOSELECT then
   begin
     case fFileType of
