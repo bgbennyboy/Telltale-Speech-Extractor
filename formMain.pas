@@ -222,6 +222,8 @@ type
     heFinalSeason1: TMenuItem;
     Menu_WalkingDead_S4_DoneRunning: TMenuItem;
     Menu_WalkingDead_S4_SufferTheChildren: TMenuItem;
+    Menu_WalkingDead_S4_TakeUsBack: TMenuItem;
+    Menu_WalkingDead_S4_BrokenToys: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;

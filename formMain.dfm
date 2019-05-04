@@ -8239,6 +8239,16 @@ object frmMain: TfrmMain
           ImageIndex = 12
           OnClick = OpenPopupMenuHandler
         end
+        object Menu_WalkingDead_S4_BrokenToys: TMenuItem
+          Caption = 'Broken Toys'
+          ImageIndex = 12
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_WalkingDead_S4_TakeUsBack: TMenuItem
+          Caption = 'Take Us Back'
+          ImageIndex = 12
+          OnClick = OpenPopupMenuHandler
+        end
       end
     end
     object TheWolfAmongUs1: TMenuItem
