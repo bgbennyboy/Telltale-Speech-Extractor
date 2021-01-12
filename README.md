@@ -36,7 +36,45 @@ Just the games themselves.
   
 -   To reset the view either delete the text in the search box or click the View button and select View all files.
   
+## What games are supported?
+All games released so far by Telltale and Skunkape Games. Thats:
 
+-   Back To The Future
+-   Batman: The Telltale Series
+-   Batman: The Enemy Within
+-   Bone: Out From Boneville
+-   Bone: The Great Cow Race
+-   Crime Scene Investigation - 3 Dimensions of Murder
+-   Crime Scene Investigation - Hard Evidence
+-   Crime Scene Investigation - Deadly Intent
+-   Crime Scene Investigation - Fatal Conspiracy
+-   Game of Thrones
+-   Guardians of the Galaxy
+-   Hector: Badge Of Carnage
+-   Jurassic Park
+-   Law & Order: Legacies
+-   Minecraft Story mode: Season 1
+-   Minecraft Story mode: Season 2
+-   Nelson Tethers - Puzzle Agent
+-   Poker Night At The Inventory
+-   Poker Night 2
+-   Sam and Max: Season 1
+-   Sam and Max: Season 2
+-   Sam and Max: Season 3
+-   Sam and Max Save the World
+-   Strong Bad: Season 1
+-   Tales From The Borderlands
+-   Tales Of Monkey Island
+-   The Walking Dead Season One (and 400 Days DLC)
+-   The Walking Dead Season 2
+-   The Walking Dead Michonne
+-   The Walking Dead Season 3
+-   The Walking Dead Season 4
+-   The Walking Dead: The Definitive Series
+-   The Wolf Among Us
+-   Telltale Texas Hold’em
+-   Wallace and Gromit’s Grand Adventure
+- 
 ## Annotations: 
 The sounds do not contain any textual information about their contents beyond the filename. To assist with this problem Telltale Speech Extractor supports annotations.  
   
