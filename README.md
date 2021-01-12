@@ -74,7 +74,7 @@ All games released so far by Telltale and Skunkape Games. Thats:
 -   The Wolf Among Us
 -   Telltale Texas Hold’em
 -   Wallace and Gromit’s Grand Adventure
-- 
+
 ## Annotations: 
 The sounds do not contain any textual information about their contents beyond the filename. To assist with this problem Telltale Speech Extractor supports annotations.  
   
