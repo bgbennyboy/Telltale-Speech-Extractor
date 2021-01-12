@@ -12,7 +12,7 @@ interface
 
 const
 {************************************Global************************************}
-  strAppVersion:         string = '1.4.1';
+  strAppVersion:         string = '1.4.2';
   strAppTitle:           string = 'Telltale Speech Extractor';
   strAppURL:             string = 'http://quickandeasysoftware.net';
   

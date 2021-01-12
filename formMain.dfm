@@ -3940,7 +3940,6 @@ object frmMain: TfrmMain
     Header.Height = 18
     Header.MainColumn = 3
     Header.Options = [hoAutoResize, hoColumnResize, hoDblClickResize, hoDrag, hoHotTrack, hoShowImages, hoVisible, hoAutoSpring]
-    Header.ParentFont = True
     Header.PopupMenu = AdvPopupMenuFilter
     Header.SortColumn = 0
     Header.Style = hsPlates
@@ -3961,31 +3960,31 @@ object frmMain: TfrmMain
         MinWidth = 80
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 0
+        Text = 'Category'
         Width = 134
-        WideText = 'Category'
       end
       item
         MinWidth = 300
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 1
+        Text = 'Annotation'
         Width = 411
-        WideText = 'Annotation'
       end
       item
         MaxWidth = 60
         MinWidth = 50
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 2
+        Text = 'Length'
         Width = 60
-        WideText = 'Length'
       end
       item
         MaxWidth = 150
         MinWidth = 100
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 3
+        Text = 'Filename'
         Width = 150
-        WideText = 'Filename'
       end>
   end
   object pnlTop: TPanel
@@ -6005,7 +6004,7 @@ object frmMain: TfrmMain
     TabOrder = 3
     UseDockManager = True
     Visible = False
-    Version = '2.4.2.0'
+    Version = '2.5.8.0'
     AutoHideChildren = False
     BorderColor = 16765615
     Caption.Color = 16316406
@@ -6077,6 +6076,7 @@ object frmMain: TfrmMain
       ColorHighlightText = clHighlightText
       ColorDisabledText = clGrayText
       Enabled = False
+      SuperSubScriptRatio = 0.666666666666666600
       TabOrder = 2
       OnChange = comboboxAnnotCategoryChange
     end
@@ -6527,7 +6527,7 @@ object frmMain: TfrmMain
     SimplePanel = False
     SizeGrip = False
     URLColor = clBlue
-    Version = '1.5.0.0'
+    Version = '1.5.2.1'
   end
   object dlgBrowseForSaveFolder: TJvBrowseForFolderDialog
     RootDirectory = fdDesktopDirectory
@@ -6655,7 +6655,7 @@ object frmMain: TfrmMain
   object AdvPopupMenuFilter: TAdvPopupMenu
     Images = ImageList1
     MenuStyler = AdvMenuOfficeStyler1
-    Version = '2.6.1.1'
+    Version = '2.6.6.0'
     Left = 568
     Top = 96
   end
@@ -6676,12 +6676,13 @@ object frmMain: TfrmMain
       'ormat to avoid re-encoding and a loss of quality. Choosing one o' +
       'f the other options will mean that all the audio is dumped in th' +
       'is format and the audio will be re-encoded if necessary.'
+    FooterTextColor = clWindowText
     Icon = tiQuestion
     Title = 'Save All Files'
     Instruction = 'Save files as:'
     ExpandControlText = 'More information'
     Options = [doCommandLinks]
-    Version = '1.8.9.0'
+    Version = '2.0.5.2'
     Left = 464
     Top = 104
   end
@@ -6696,6 +6697,7 @@ object frmMain: TfrmMain
     Settings.BorderShadow = False
     Settings.BorderStyle = bsNone
     Settings.BorderWidth = 0
+    Settings.BottomIndent = 0
     Settings.CanMove = False
     Settings.CanSize = False
     Settings.Caption.Color = 16316406
@@ -8019,6 +8021,40 @@ object frmMain: TfrmMain
           OnClick = OpenPopupMenuHandler
         end
       end
+      object SaveTheWorld1: TMenuItem
+        Caption = 'Save The World'
+        ImageIndex = 3
+        object Menu_SamAndMax_SaveTheWorld_EP1: TMenuItem
+          Caption = '101 Culture Shock'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_SaveTheWorld_EP2: TMenuItem
+          Caption = '102 Situation Comedy'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_SaveTheWorld_EP3: TMenuItem
+          Caption = '103 The Mole, the Mob and the Meatball'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_SaveTheWorld_EP4: TMenuItem
+          Caption = '104 Abe Lincoln Must Die!'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_SaveTheWorld_EP5: TMenuItem
+          Caption = '105 Reality 2.0'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_SaveTheWorld_EP6: TMenuItem
+          Caption = '106 Bright Side Of The Moon'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+      end
     end
     object MenuItem9: TMenuItem
       Caption = 'Strong Bad'
@@ -8248,6 +8284,154 @@ object frmMain: TfrmMain
           Caption = 'Take Us Back'
           ImageIndex = 12
           OnClick = OpenPopupMenuHandler
+        end
+      end
+      object heDefinitiveSeries1: TMenuItem
+        Caption = 'The Definitive Series'
+        ImageIndex = 12
+        object SeasonOne1: TMenuItem
+          Caption = 'Season One'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeries101: TMenuItem
+            Caption = 'Episode 101'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries102: TMenuItem
+            Caption = 'Episode 102'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries103: TMenuItem
+            Caption = 'Episode 103'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries104: TMenuItem
+            Caption = 'Episode 104'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries105: TMenuItem
+            Caption = 'Episode 105'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries106: TMenuItem
+            Caption = 'Episode 106'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+        end
+        object SeasonTwo1: TMenuItem
+          Caption = 'Season Two'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeries201: TMenuItem
+            Caption = 'Episode 201'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries202: TMenuItem
+            Caption = 'Episode 202'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries203: TMenuItem
+            Caption = 'Episode 203'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries204: TMenuItem
+            Caption = 'Episode 204'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries205: TMenuItem
+            Caption = 'Episode 205'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+        end
+        object SeasonThree2: TMenuItem
+          Caption = 'Season Three'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeries301: TMenuItem
+            Caption = 'Episode 301'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries302: TMenuItem
+            Caption = 'Episode 302'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries303: TMenuItem
+            Caption = 'Episode 303'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries304: TMenuItem
+            Caption = 'Episode 304'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries305: TMenuItem
+            Caption = 'Episode 305'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+        end
+        object SeasonFour1: TMenuItem
+          Caption = 'Season Four'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeries401: TMenuItem
+            Caption = 'Episode 401'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries402: TMenuItem
+            Caption = 'Episode 402'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries403: TMenuItem
+            Caption = 'Episode 403'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeries404: TMenuItem
+            Caption = 'Episode 404'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+        end
+        object Michonne2: TMenuItem
+          Caption = 'Michonne'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeriesM101: TMenuItem
+            Caption = 'Michonne 101'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeriesM102: TMenuItem
+            Caption = 'Michonne 102'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+          object Menu_WalkingDead_TheDefinitiveSeriesM103: TMenuItem
+            Caption = 'Michonne 103'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
+        end
+        object Other1: TMenuItem
+          Caption = 'Other'
+          ImageIndex = 12
+          object Menu_WalkingDead_TheDefinitiveSeriesMenuVoice: TMenuItem
+            Caption = 'Menu Voices'
+            ImageIndex = 12
+            OnClick = OpenPopupMenuHandler
+          end
         end
       end
     end

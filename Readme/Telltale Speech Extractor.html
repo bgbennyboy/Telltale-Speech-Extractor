@@ -1,394 +1,178 @@
-<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN"
-"http://www.w3.org/TR/html4/loose.dtd">
+﻿<!DOCTYPE html>
 <html>
+
 <head>
-	<title>Telltale Speech Extractor ReadMe</title>
-	<meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-	<style type="text/css">
-	<!--
-	.style7 {font-family: Verdana, Arial, Helvetica, sans-serif}
-	.style10 {font-size: large}
-	.style12 {font-size: small}
-	-->
-	</style>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>README</title>
+    <style>html{line-height:1.15;-ms-text-size-adjust:100%;-webkit-text-size-adjust:100%}body{margin:0}h1{font-size:2em;margin:.67em 0}pre{font-family:monospace,monospace;font-size:1em}a{background-color:transparent;-webkit-text-decoration-skip:objects}strong{font-weight:inherit;font-weight:bolder}code{font-family:monospace,monospace;font-size:1em}::-webkit-file-upload-button{-webkit-appearance:button;font:inherit}body,html{color:rgba(0,0,0,.75);font-size:16px;font-family:Lato,Helvetica Neue,Helvetica,sans-serif;font-variant-ligatures:common-ligatures;line-height:1.67;-webkit-font-smoothing:antialiased;-moz-osx-font-smoothing:grayscale}blockquote,ol,p,pre,ul{margin:1.2em 0}h1,h2{margin:1.8em 0;line-height:1.33}h1:after,h2:after{content:"";display:block;position:relative;top:.33em;border-bottom:1px solid hsla(0,0%,50%,.33)}a{color:#0c93e4;text-decoration:underline;text-decoration-skip:ink}a:focus,a:hover{text-decoration:none}code,pre{font-family:Roboto Mono,Lucida Sans Typewriter,Lucida Console,monaco,Courier,monospace;font-size:.85em}pre *{font-size:inherit}blockquote{color:rgba(0,0,0,.5);padding-left:1.5em;border-left:5px solid rgba(0,0,0,.1)}code{background-color:rgba(0,0,0,.05);border-radius:3px;padding:2px 4px}pre>code{background-color:rgba(0,0,0,.05);display:block;padding:.5em;-webkit-text-size-adjust:none;overflow-x:auto;white-space:pre}.stackedit__html{margin-bottom:180px;margin-left:auto;margin-right:auto;padding-left:30px;padding-right:30px;max-width:750px}
+  </style>
+<style>h1{margin:0.5em 0;}
+  h2,h3,h4,h5,h6{margin:1.5em 0;}</style>
+</head>
 </head>
 
-<body>
-	<span class="style7">
-		<span class="style10">
-			Telltale Speech Extractor<br>
-			By Bennyboy<br>
-			Version 1.4.1<br>
-			<a href="http://quickandeasysoftware.net">http://quickandeasysoftware.net</a><br><br>
-		</span>
-	</span>
-
-	<p class="style7"><strong><em>New in this version:</em></strong></p>
-	<ul>
-		<li class="style7">Added support for episodes 3 and 4 of The Walking Dead season 4.</li><br>
-	</ul>
-	
-	<p class="style7"><strong><em>New in the previous version (1.4.0):</em></strong></p>
-	<ul>
-		<li class="style7">Added support for episodes 1 and 2 of The Walking Dead season 4.</li><br>
-		<li class="style7">Added support for Minecraft Story Mode Season 2 Episodes 3-5. As with the other Minecraft episodes some speech files for Jesse are also in the "MCSM_pc_JesseMale" files so you might want to open those separately.</li><br>	
-		<li class="style7">Added support for episodes 3-5 of Batman Season 2.</li><br>	
-		<li class="style7">Added support for episode 5 of Guardians of the Galaxy.</li><br>	
-	</ul>
-
-	
-	<p class="style7"><strong><em>What is Telltale Speech Extractor ?:</em></strong><br>
-		A program that enables you to rip the voices and sfx from all games released by Telltale Games. That includes:
-	</p>
-	
-	<ul class="style7">
-		<li>Back To The Future</li>
-		<ul>
-		<li>It's About Time</li>
-		<li>Get Tannen!</li>
-		<li>Citizen Brown</li>
-		<li>Double Visions</li>
-		<li>Outa Time</li>
-		</ul>	
-		<li>Batman: The Telltale Series</li>
-		<ul>
-		<li>Realm of Shadows</li>
-		<li>Children of Arkham</li>
-		<li>New World Order</li>
-		<li>Guardian of Gotham</li>
-		<li>City of Lights</li>
-		</ul>		
-		<li>Batman: The Enemy Within</li>
-		<ul>
-		<li>The Enigma</li>
-		<li>The Pact</li>	
-		<li>Fractured Mask</li>
-		<li>What Ails You</li>
-		<li>Same Stitch</li>		
-		</ul>
-		<li>Bone: Out From Boneville</li>
-		<li>Bone: The Great Cow Race</li>
-		<li>Crime Scene Investigation - 3 Dimensions of Murder</li>
-		<li>Crime Scene Investigation - Hard Evidence</li>
-		<li>Crime Scene Investigation - Deadly Intent</li>
-		<li>Crime Scene Investigation - Fatal Conspiracy</li>
-		<li>Game of Thrones</li>
-		<ul>		
-		<li>Iron From Ice</li>
-		<li>The Lost Lords</li>
-		<li>The Sword in the Darkness </li>		
-		<li>Sons of Winter </li>			
-		<li>A Nest of Vipers </li>			
-		<li>The Ice Dragon</li>			
-		</ul>	
-		<li>Guardians of the Galaxy</li>
-		<ul>		
-		<li>Tangled Up in Blue</li>
-		<li>Under Pressure</li>
-		<li>More than a Feeling</li>		
-		<li>Who Needs You</li>		
-		<li>Don't Stop Believin</li>				
-		</ul>			
-		<li>Hector: Badge Of Carnage</li>
-		<ul>		
-		<li>We Negotiate with Terrorists</li>
-		<li>Senseless Acts of Justice</li>
-		<li>Beyond Reasonable Doom</li>		
-		</ul>
-		<li>Jurassic Park</li>	
-		<li>Law & Order: Legacies</li>
-		<li>Minecraft: Story mode</li>
-		<ul>
-		<li>The Order of the Stone</li>
-		<li>Assembly Required</li>
-		<li>The Last Place You Look</li>
-		<li>A Block and a Hard Place</li>
-		<li>Order Up!</li>
-		<li>A Portal to Mystery</li>
-		<li>Access Denied</li>
-		<li>A Journey's End?</li>
-		</ul>			
-		<li>Minecraft Story mode: Season 2</li>
-		<ul>
-		<li>Hero in Residence</li>
-		<li>Giant Consequences</li>
-		<li>Jailhouse Block</li>
-		<li>Below the Bedrock</li>
-		<li>Above and Beyond</li>
-		</ul>			
-		<li>Nelson Tethers - Puzzle Agent</li>
-		<ul>
-		<li>Episode 1</li>
-		<li>Episode 2</li>
-		</ul>		
-		<li>Poker Night At The Inventory</li>
-		<li>Sam and Max: Season 1:</li>
-		<ul>
-		<li>Sam and Max: Culture Shock</li>
-		<li>Sam and Max: Situation Comedy</li>
-		<li>Sam and Max: The Mole The Mob And The Meatball</li>
-		<li>Sam and Max: Abe Lincoln Must Die</li>
-		<li>Sam and Max: Reality 2.0</li>
-		<li>Sam and Max: Bright Side Of The Moon</li></ul>
-		<li>Sam and Max: Season 2:</li>
-		<ul>
-		<li>Sam and Max: Ice Station Santa</li>
-		<li>Sam and Max: Moai Better Blues</li>
-		<li>Sam and Max: Night Of The Raving Dead</li>
-		<li>Sam and Max: Chariots Of The Dogs</li>
-		<li>Sam and Max: What's New Beelzebub</li></ul>		
-		
-		<li>Sam and Max: Season 3:</li>
-		<ul>
-		<li>Sam and Max: The Penal Zone</li>
-		<li>The Tomb of Sammun-Mak</li>
-		<li>They Stole Max's Brain</li>
-		<li>Beyond the Alley of the Dolls</li>	
-		<li>The City That Dares Not Sleep</li></ul>	
-		
-		<li>Strong Bad: Season 1:</li>
-		<ul>
-		<li>Strong Bad: Homestar Ruiner</li>
-		<li>Strong Bad: Strong Badia The Free</li>
-		<li>Strong Bad: Baddest Of The Bands</li>
-		<li>Strong Bad: Dangeresque 3</li>
-		<li>Strong Bad: 8-Bit Is Enough</li></ul>
-		<li>Tales From The Borderlands</li>	
-		<ul>	
-		<li>Zer0 Sum</li>
-		<li>Atlas Mugged</li>
-		<li>Catch a Ride</li>
-		<li>Escape Plan Bravo</li>
-		<li>The Vault of the Traveler</li>
-		</ul>		
-		<li>Tales Of Monkey Island: Season 1</li>
-		<ul>	
-		<li>Launch Of The Screaming Narwhal</li>
-		<li>The Siege of Spinner Cay</li>
-		<li>Lair of the Leviathan</li>
-		<li>The Trial and Execution of Guybrush Threepwood</li>
-		<li>Rise of the Pirate God</li>
-		</ul>	
-		<li>The Walking Dead Season One</li>
-		<ul>	
-		<li>Episode 1: A New Day</li>
-		<li>Episode 2: Starved For Help</li>
-		<li>Episode 3: Long Road Ahead</li>
-		<li>Episode 4: Around Every Corner</li>
-		<li>Episode 5: No Time Left</li>
-		<li>Episode 6: 400 Days (DLC)</li>		
-		</ul>	
-		<li>The Walking Dead Season 2</li>
-		<ul>	
-		<li>Episode 1: All That Remains</li>
-		<li>Episode 2: A House Divided</li>	
-		<li>Episode 3: In Harm's Way</li>	
-		<li>Episode 4: Amid the Ruins</li>	
-		<li>Episode 5: No Going Back</li>			
-		</ul>
-		<li>The Walking Dead Michonne</li>
-		<ul>	
-		<li>Episode 1: In Too Deep</li>
-		<li>Episode 2: Give No Shelter</li>
-		<li>Episode 3: What We Deserve</li>		
-		</ul>	
-		<li>The Walking Dead Season 3</li>
-		<ul>	
-		<li>Episode 1: Ties That Bind - Part One</li>
-		<li>Episode 2: Ties That Bind - Part Two</li>
-		<li>Episode 3: Above the Law</li>
-		<li>Episode 4: Thicker Than Water</li>
-		<li>Episode 5: From the Gallows</li>		
-		</ul>	
-		<li>The Walking Dead Season 4</li>
-		<ul>	
-		<li>Episode 1: Done Running</li>
-		<li>Episode 2: Suffer the Children</li>	
-		<li>Episode 3: Broken Toys</li>	
-		<li>Episode 4: Take Us Back</li>	
-		</ul>			
-		<li>The Wolf Among Us</li>
-		<ul>	
-		<li>Episode 1: Faith</li>
-		<li>Episode 2: Smoke and Mirrors</li>
-		<li>Episode 3: A Crooked Mile</li>
-		<li>Episode 4: In Sheep's Clothing</li>
-		<li>Episode 5: Cry Wolf</li>
-		</ul>			
-		<li>Telltale Texas Hold&rsquo;em</li>
-		<li>Wallace and Gromit&rsquo;s Grand Adventure</li>
-		<ul>	
-		<li>Fright Of The Bumblebees</li>
-		<li>The Last Resort</li>
-		<li>Muzzled!</li>
-		<li>The Bogey Man</li>
-		</ul>	
-		
-	</ul>
-	
-	
-	<p class="style7"><em><strong>What do I need to use this?:</strong></em><br> 
-		Just the games themselves.
-	</p>
-	
-
-	<p class="style7"><em><strong>How to use it:</strong></em><br></p>
-	<ul>
-		<li class="style7">Click <i><u>Open</i></u> and either click on open folder and choose a folder yourself or choose one of the games and the files will automatically be found.</li><br>
-		<li class="style7">Click the <i><u>Play Sound</i></u> button or press enter to play the currently selected sound.</li><br>
-		<li class="style7">Click <i><u>Save File</i></u> to save a sound. You can choose to save as a WAV or OGG file or let the program automatically choose the most appropriate format. OGG files will be tagged with the annotation text.</li><br>
-		<li class="style7">Click <i><u>Save All Files</i></u> to save the sounds as WAV or OGG or let the program automatically choose the most appropriate format.</li><br>
-		<li class="style7">Click the <i><u>Annotations</i></u> button to edit annotations. See the 'Annotations' section below for more information.</li><br>
-	</ul>
-		<p class="style7">Filtering the sounds:</p>
-	<ul>
-		<li class="style7">Click on the <i><u>View</i></u> button to show a list of all the categories (characters), selecting one of these changes the view so that only sounds in that category are visible.</li><br>
-		<li class="style7">To reset the view and show all categories, click the button again and click <i><u>View All Files</i></u>.</li> 
-	</ul>	
-		<p class="style7">Searching the sounds:</p>
-	<ul>
-		<li class="style7">To search just type in the search box. Searching ignores any filter that you've used. I.e. the view will be reset to 'All Files'. The search looks in file names and annotations and is an 'instant search' - the search happens as you type.</li><br>
-		<li class="style7">To reset the view either delete the text in the search box or click the View button and select View all files.</li><br>
-	</ul>
-	
-
-	<p class="style7">
-		<em><strong>Annotations:</strong></em>
-		<br>	
-		The sounds do not contain any textual information about their contents beyond the filename. To assist with this problem Telltale Speech Extractor supports annotations.<br><br>
-		Annotations are descriptive names given to sounds. They list what is said and what character says it. This allows the sounds to be easily browsed, filtered and searched. They are also used when a sound is saved as an MP3. Windows imposes a limit on the length of file names, so its difficult to make a descriptive filename with the limited numbers of characters available. To counter this Telltale Speech Extractor embeds the sound's annotation inside the MP3 as an ID3 tag. This makes it much easier to identify and find the sounds in Windows and music players.<br><br>
-		The program comes with annotations for every Telltale game currently available, they are not all 100% complete though. In some games, there are some sounds that don't have annotations, however the annotations can be changed and new ones added. Clicking the <i><u>Annotations</i></u> button brings up the annotation editing panel. In here you can edit annotations, change and add annotation categories. Remember to click the <i><u>Save Changes</i></u> button when you're done, as the annotations are not automatically saved.<br><br>
-		If you add annotations to a game, please send me your updated annotation files so that I can add them to the next release of the program. The annotation files are just standard ini files, they can be found in the 'Annotations' folder and have the file extension '.annot'.<br>		
-	</p>	
-	
-	
-	<br>
-	<p class="style7">
-		<em><strong>Bugs/Limitations:</strong></em>
-		<br>
-		Originally each episode of a game stored its resources in separate folders. However most newer games store the resources for all episodes in the same folder. The Walking Dead Season 2 and all games released since do this. If you manually choose the game folder by clicking 'open folder' then the program cant know which episode you want. To fix - either choose the specific episode from the menu or choose 'open file' and select the individual file that you want to extract speech from..<br><br>
-		The tool only rips audio from the speech files. If you want to rip the music files then download Telltale Music Extractor from my <a href="http://quickandeasysoftware.net">website.</a>
-	</p>
-	
-	<br>
-	<p class="style7">
-		<em><strong>Technical details:</strong></em>
-		<br>
-		The speech files used in Telltale games have changed over time, generally speaking there are 4 types of audio file used:<br>
-		
-		<ul class="style7">
-		<li>(.VOX) Vox V1 - These use the Speex codec to store the speech, however the Speex data is not stored in a vorbis container. The audio is divided up into 'packets', some of which are encrypted.</li><br>
-		<li>(.VOX) Vox V2 - These are esentially the same as Vox V1 - but the file header is different and there's no encryption.</li><br>
-		<li>(.AUD) Ogg audio - These are standard Ogg files with an extra header. The format of the header is not always the same and changes between games.</li><br>
-		<li>(.FSB) FSB audio - Seen in The Walking Dead and later games, these are standard FSB files. Different FSB versions and codecs have been used throughout the games.</li><br>
-		</ul>		
-		
-		<p class="style7">
-		The way the files are stored has also changed. In earlier games (those released before Strongbad) the audio files were stored individually inside the Pack\Data\ folder. However later games packed the files inside a .ttarch bundle. To get at these files you have to get them out of the bundle first.<br><br>
-		
-		To make things even more complicated there's also the issue of encryption. In 'VOX V1' files, packet 0 and every 64th packet are encrypted, so to get correct audio you have to decrypt these. However the encryption keys differ between games. CSI 3 Dimensions of Murder and the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem all use the same key. However the original releases of Sam and Max 102-106 all used different keys.<br><br>
-		
-		In the last few years though Telltale have released updated versions of Sam and Max Season 1, Bone1, Bone2 and Texas Holdem. These now use the VOX V2 format, so arent encrypted.<br><br>
-		
-		To summarise, here is the crazy array of formats and containers that this program supports:
-		</p>
-		
-		<ul class="style7">
-			<li>V1 VOX files that are partially encrypted, with some games using a different key.</li>
-			<ul>
-								<li>CSI: 3 Dimensions of Murder, the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.</li>
-			</ul><br>
-			<li>V2 VOX files with a slightly different format and no encryption.</li>
-			<ul>
-								<li>CSI: Hard Evidence, Sam and Max Season 2, the updated releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.</li>
-			</ul><br>
-								
-			<li>AUD (ogg) files packed inside an encrypted .ttarch bundle.</li>
-			<ul>
-								<li>Strongbad Season 1.</li>
-			</ul><br>
-
-			<li>AUD (ogg) files packed inside a different format, compressed and even more encrypted .ttarch bundle.</li>
-			<ul>
-								<li>The majority of games released since Strongbad.</li>
-			</ul><br>							
-			
-			<li>V2 VOX files packed inside a different format, compressed and even more encrypted .ttarch bundle.</li>
-			<ul>
-								<li>Poker Night At The Inventory and CSI Fatal Conspiracy.</li>
-			</ul><br>		
-			
-			<li>FSB files packed inside a compressed and even more encrypted .ttarch bundle.</li>
-			<ul>
-								<li>The Walking Dead and all games released since then.</li>
-			</ul>	
-			
-		</ul>
-	</p>
-	
-	
-
-	<br>
-	<p class="style7"><em><strong>Credits and thanks:</strong></em></p>
-	<ul>
-		<li class="style7">Anders Jakobsen for his help with the FSB files<br>
-			http://aezay.site11.com</li><br>
-			
-		<li class="style7">Annotation Icon from Buff Set by Mattahan<br>
-			http://mattahan.deviantart.com</li><br>
-			
-		<li class="style7">Clear, Add and Undo icons from the TiiconCollection by Timon Freitag<br>
-			http://projects.ff22.de/tiicon/</li><br>
-
-		<li class="style7">Delphi Speex Wrapper by Bech<br>
-			http://www.sed-p.net</li><br>
-
-		<li class="style7">Disk and View Icons by glyFX<br>
-			http://www.glyfx.com</li><br>
-
-		<li class="style7">Glow Buttons, Popup Menus, Status Bar and Task Dialog by TMS Software<br>
-			http://www.tmssoftware.com</li><br>
-
-		<li class="style7">JEDI Code Library<br>
-			http://sourceforge.net/projects/jcl</li><br>
-
-		<li class="style7">JEDI Visual Code Library<br>
-			http://homepages.codegear.com/jedi/jvcl</li><br>
-
-		<li class="style7">MP3FileUtils by Daniel Gaussmann<br>
-			http://www.gausi.de</li><br>
-			
-		<li class="style7">Ogg Vorbis and Opus Tag Library by 3delite<br>
-			http://www.3delite.hu</li><br>
-			
-		<li class="style7">Open icon by Clever Icons<br>
-			http://www.clevericons.com</li><br>
-
-		<li class="style7">Sam and Max Season One Annotations were fixed, updated and completed by Christoph 'Aeon' Loewe<br>
-			http://aeons.planetquake.gamespy.com</li><br>
-			
-		<li class="style7">Simon Boyes - for advice and testing<br><br>
-
-		<li class="style7">All the former staff at Telltale Games<br>
-			Thanks for making such brilliant games<br>
-			http://www.telltalegames.com</li><br>
-
-		<li class="style7">Virtual Treeview by Mike Lischke<br>
-			http://www.delphi-gems.com</li><br>
-
-		<li class="style7">Wave Writer class by Benjamin Haisch (John_Doe)<br>
-			http://gamefileformats.netfirms.com</li><br>
-	</ul>
-	
-	<br>
-	<p class="style7"><em><strong>Support:</strong></em>
-		<br>
-		<a href="http://quickandeasysoftware.net/contact">Contact me</a>.
-		<br><br>
-		All my software is completely free. If you find this program useful please consider making a donation. This can be done on my <a href="http://quickandeasysoftware.net">website.</a>
-	</p>
-	
-	<br>
-	<p class="style7 style12">Bennyboy 04/05/19</p>
+<body class="stackedit">
+  <div class="stackedit__html"><h1 id="telltale-speech-extractor">Telltale Speech Extractor</h1>
+<p>Version 1.4.2<br>By Bennyboy<br><a href="https://quickandeasysoftware.net/">Quick and Easy Software</a></p>
+<p>A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games’ Sam &amp; Max Save the World.</p>
+<h2 id="new-in-this-version">New in this version</h2>
+<ul>
+<li>Added support for Sam &amp; Max Save the World</li>
+<li>Added support for The Walking Dead: The Definitive Series.</li>
+<li>Fixed auto-detection of game location for all the games released since Batman season 1.</li>
+</ul>
+<h2 id="what-do-i-need-to-use-this">What do I need to use this?</h2>
+<p>Just the games themselves.</p>
+<h2 id="how-to-use-it">How to use it</h2>
+<ol>
+<li>Click <em>Open</em> and either click on open folder and choose a folder<br>
+yourself or choose one of the games and the files will automatically<br>
+be found.</li>
+<li>Click the <em>Play Sound</em> button or press enter to play the currently selected sound.</li>
+<li>Click <em>Save File</em> to save a sound. You can choose to save as a WAV or OGG file or let the program automatically choose the most appropriate format. OGG files will be tagged with the annotation text.</li>
+<li>Click <em>Save All Files</em> to save the sounds as WAV or OGG or let the program automatically choose the most appropriate format.</li>
+<li>Click the <em>Annotations</em> button to edit annotations. See the ‘Annotations’ section below for more information.</li>
+</ol>
+<h3 id="filtering-the-sounds">Filtering the sounds:</h3>
+<ul>
+<li>
+<p>Click on the <em>View</em> button to show a list of all the categories (characters), selecting one of these changes the view so that only sounds in that category are visible.</p>
+</li>
+<li>
+<p>To reset the view and show all categories, click the button again and click <em>View All Files</em>.</p>
+</li>
+</ul>
+<h3 id="searching-the-sounds">Searching the sounds:</h3>
+<ul>
+<li>
+<p>To search just type in the search box. Searching ignores any filter that you’ve used. I.e. the view will be reset to ‘All Files’. The search looks in file names and annotations and is an ‘instant search’ - the search happens as you type.</p>
+</li>
+<li>
+<p>To reset the view either delete the text in the search box or click the View button and select View all files.</p>
+</li>
+</ul>
+<h2 id="annotations">Annotations:</h2>
+<p>The sounds do not contain any textual information about their contents beyond the filename. To assist with this problem Telltale Speech Extractor supports annotations.</p>
+<p>Annotations are descriptive names given to sounds. They list what is said and what character says it. This allows the sounds to be easily browsed, filtered and searched. They are also used when a sound is saved as an MP3. Windows imposes a limit on the length of file names, so its difficult to make a descriptive filename with the limited numbers of characters available. To counter this Telltale Speech Extractor embeds the sound’s annotation inside the MP3 as an ID3 tag. This makes it much easier to identify and find the sounds in Windows and music players.</p>
+<p>The program comes with annotations for every Telltale game currently available, they are not all 100% complete though. In some games, there are some sounds that don’t have annotations, however the annotations can be changed and new ones added. Clicking the <em>Annotations</em> button brings up the annotation editing panel. In here you can edit annotations, change and add annotation categories. Remember to click the <em>Save Changes</em> button when you’re done, as the annotations are not automatically saved.</p>
+<p>If you add annotations to a game, please send me your updated annotation files so that I can add them to the next release of the program. The annotation files are just standard ini files, they can be found in the ‘Annotations’ folder and have the file extension ‘.annot’.</p>
+<h2 id="bugs-and-limitations">Bugs and limitations:</h2>
+<p>Originally each episode of a game stored its resources in separate folders. However most newer games store the resources for all episodes in the same folder. The Walking Dead Season 2 and all games released since do this. If you manually choose the game folder by clicking ‘open folder’ then the program cant know which episode you want.<br>
+To fix - either choose the specific episode from the menu or choose ‘open file’ and select the individual file that you want to extract speech from…</p>
+<p>The tool only rips audio from the speech files. If you want to rip the music files then download Telltale Music Extractor from my <a href="https://quickandeasysoftware.net">website.</a></p>
+<h2 id="technical-details">Technical details:</h2>
+<p>The speech files used in Telltale games have changed over time, generally speaking there are 4 types of audio file used:</p>
+<ul>
+<li>
+<p>(.VOX) Vox V1 - These use the Speex codec to store the speech, however the Speex data is not stored in a vorbis container. The audio is divided up into ‘packets’, some of which are encrypted.</p>
+</li>
+<li>
+<p>(.VOX) Vox V2 - These are esentially the same as Vox V1 - but the file header is different and there’s no encryption.</p>
+</li>
+<li>
+<p>(.AUD) Ogg audio - These are standard Ogg files with an extra header. The format of the header is not always the same and changes between games.</p>
+</li>
+<li>
+<p>(.FSB) FSB audio - Seen in The Walking Dead and later games, these are standard FSB files. Different FSB versions and codecs have been used throughout the games.</p>
+</li>
+</ul>
+<p>The way the files are stored has also changed. In earlier games (those released before Strongbad) the audio files were stored individually inside the Pack\Data\ folder. However later games packed the files inside a .ttarch bundle. To get at these files you have to get them out of the bundle first.</p>
+<p>To make things even more complicated there’s also the issue of encryption. In ‘VOX V1’ files, packet 0 and every 64th packet are encrypted, so to get correct audio you have to decrypt these. However the encryption keys differ between games. CSI 3 Dimensions of Murder and the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem all use the same key. However the original releases of Sam and Max 102-106 all used different keys.</p>
+<p>In the last few years though Telltale released updated versions of Sam and Max Season 1, Bone1, Bone2 and Texas Holdem. These now use the VOX V2 format, so aren’t encrypted.</p>
+<p>To summarise, here is the crazy array of formats and containers that this program supports:</p>
+<ul>
+<li>
+<p>V1 VOX files that are partially encrypted, with some games using a different key.</p>
+<ul>
+<li>CSI: 3 Dimensions of Murder, the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.</li>
+</ul>
+</li>
+<li>
+<p>V2 VOX files with a slightly different format and no encryption.</p>
+<ul>
+<li>CSI: Hard Evidence, Sam and Max Season 2, the updated releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.</li>
+</ul>
+</li>
+<li>
+<p>AUD (ogg) files packed inside an encrypted .ttarch bundle.</p>
+<ul>
+<li>Strongbad Season 1.</li>
+</ul>
+</li>
+<li>
+<p>AUD (ogg) files packed inside a different format, compressed and even more encrypted .ttarch bundle.</p>
+<ul>
+<li>Most games released from Strongbad until The Walking Dead.</li>
+</ul>
+</li>
+<li>
+<p>V2 VOX files packed inside a different format, compressed and even more encrypted .ttarch bundle.</p>
+<ul>
+<li>Poker Night At The Inventory and CSI Fatal Conspiracy.</li>
+</ul>
+</li>
+<li>
+<p>FSB files packed inside a compressed and even more encrypted .ttarch bundle.</p>
+<ul>
+<li>The Walking Dead and all games released since then.</li>
+</ul>
+</li>
+</ul>
+<h2 id="credits-and-thanks">Credits and thanks:</h2>
+<ul>
+<li>
+<p><a href="http://aezay.site11.com">Anders Jakobsen</a> for his help with the FSB files</p>
+</li>
+<li>
+<p>Annotation Icon from Buff Set by <a href="http://mattahan.deviantart.com">Mattahan</a></p>
+</li>
+<li>
+<p>Clear, Add and Undo icons from the <a href="http://projects.ff22.de/tiicon/">TiiconCollection</a> by Timon Freitag</p>
+</li>
+<li>
+<p>Delphi Speex Wrapper by <a href="http://www.sed-p.net">Bech</a></p>
+</li>
+<li>
+<p>Disk and View Icons by <a href="http://www.glyfx.com">glyFX</a></p>
+</li>
+<li>
+<p><a href="http://sourceforge.net/projects/jcl">JEDI Code Library</a></p>
+</li>
+<li>
+<p><a href="http://homepages.codegear.com/jedi/jvcl">JEDI Visual Code Library</a></p>
+</li>
+<li>
+<p>MP3FileUtils by <a href="http://www.gausi.de">Daniel Gaussmann</a></p>
+</li>
+<li>
+<p>Ogg Vorbis and Opus Tag Library by <a href="http://www.3delite.hu">3delite</a></p>
+</li>
+<li>
+<p>Open icon by <a href="http://www.clevericons.com">Clever Icons</a></p>
+</li>
+<li>
+<p>Sam and Max Season One Annotations were fixed, updated and completed by <a href="http://aeons.planetquake.gamespy.com">Christoph ‘Aeon’ Loewe</a></p>
+</li>
+<li>
+<p>Simon Boyes - for advice and testing</p>
+</li>
+<li>
+<p>All the former staff at <a href="http://www.telltalegames.com">Telltale Games</a><br>
+Thanks for making such brilliant games</p>
+</li>
+<li>
+<p><a href="https://www.jam-software.com/virtual-treeview">Virtual Treeview</a> by Mike Lischke and many others since.</p>
+</li>
+<li>
+<p>Wave Writer class by <a href="http://gamefileformats.netfirms.com">Benjamin Haisch</a> (John_Doe)</p>
+</li>
+</ul>
+<h2 id="support">Support:</h2>
+<p><a href="http://quickandeasysoftware.net/contact">Contact me</a>.</p>
+<p>All my software is completely free. If you find this program useful please consider making a donation. This can be done on my <a href="http://quickandeasysoftware.net">website.</a></p>
+<p>Last updated 12/01/21</p>
+</div>
 </body>
+
 </html>
