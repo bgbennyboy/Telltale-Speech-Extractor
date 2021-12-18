@@ -119,6 +119,11 @@ const
   SamAndMaxSaveTheWorld_EP4_Bundle = 'SM1_pc_SamMax104_uncompressed.ttarch2';
   SamAndMaxSaveTheWorld_EP5_Bundle = 'SM1_pc_SamMax105_uncompressed.ttarch2';
   SamAndMaxSaveTheWorld_EP6_Bundle = 'SM1_pc_SamMax106_uncompressed.ttarch2';
+  SamAndMaxBeyondTimeAndSpace_EP1_Bundle = 'SM2_pc_SamMax201_uncompressed.ttarch2';
+  SamAndMaxBeyondTimeAndSpace_EP2_Bundle = 'SM2_pc_SamMax202_uncompressed.ttarch2';
+  SamAndMaxBeyondTimeAndSpace_EP3_Bundle = 'SM2_pc_SamMax203_uncompressed.ttarch2';
+  SamAndMaxBeyondTimeAndSpace_EP4_Bundle = 'SM2_pc_SamMax204_uncompressed.ttarch2';
+  SamAndMaxBeyondTimeAndSpace_EP5_Bundle = 'SM2_pc_SamMax205_uncompressed.ttarch2';
 var
   FileNames: TStringList;
   i: integer;
@@ -267,6 +272,11 @@ begin
       SamAndMax_SaveTheWorld_EP4:                 BundleFileName := SamAndMaxSaveTheWorld_EP4_Bundle;
       SamAndMax_SaveTheWorld_EP5:                 BundleFileName := SamAndMaxSaveTheWorld_EP5_Bundle;
       SamAndMax_SaveTheWorld_EP6:                 BundleFileName := SamAndMaxSaveTheWorld_EP6_Bundle;
+      SamAndMax_BeyondTimeAndSpace_EP1:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP1_Bundle;
+      SamAndMax_BeyondTimeAndSpace_EP2:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP2_Bundle;
+      SamAndMax_BeyondTimeAndSpace_EP3:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP3_Bundle;
+      SamAndMax_BeyondTimeAndSpace_EP4:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP4_Bundle;
+      SamAndMax_BeyondTimeAndSpace_EP5:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP5_Bundle;
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);

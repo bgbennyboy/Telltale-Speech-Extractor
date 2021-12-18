@@ -1,12 +1,10 @@
 ﻿# Telltale Speech Extractor
-Version 1.4.2<br>By Bennyboy<br>[Quick and Easy Software](https://quickandeasysoftware.net/)
+Version 1.4.3<br>By Bennyboy<br>[Quick and Easy Software](https://quickandeasysoftware.net/)
   
 A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max Save the World.
 
 ## New in this version
--  Added support for Sam & Max Save the World
-- Added support for The Walking Dead: The Definitive Series.
-- Fixed auto-detection of game location for all the games released since Batman season 1. 
+-  Added support for Sam and Max Beyond Time And Space
   
  ## What do I need to use this?  
 Just the games themselves.
@@ -62,6 +60,7 @@ All games released so far by Telltale and Skunkape Games. Thats:
 -   Sam and Max: Season 2
 -   Sam and Max: Season 3
 -   Sam and Max Save the World
+-   Sam and Max Beyond Time And Space
 -   Strong Bad: Season 1
 -   Tales From The Borderlands
 -   Tales Of Monkey Island
@@ -182,4 +181,4 @@ All my software is completely free. If you find this program useful please consi
 
   
 
-Last updated 12/01/21
+Last updated 12/12/21

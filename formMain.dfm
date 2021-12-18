@@ -3954,6 +3954,8 @@ object frmMain: TfrmMain
     OnGetImageIndex = TreeGetImageIndex
     OnGetNodeDataSize = TreeGetNodeDataSize
     OnKeyPress = TreeKeyPress
+    Touch.InteractiveGestures = [igPan, igPressAndTap]
+    Touch.InteractiveGestureOptions = [igoPanSingleFingerHorizontal, igoPanSingleFingerVertical, igoPanInertia, igoPanGutter, igoParentPassthrough]
     Columns = <
       item
         MaxWidth = 150
@@ -5990,7 +5992,6 @@ object frmMain: TfrmMain
     Width = 759
     Height = 103
     Align = alBottom
-    BevelOuter = bvNone
     Color = 16381427
     Enabled = False
     Font.Charset = DEFAULT_CHARSET
@@ -6004,7 +6005,7 @@ object frmMain: TfrmMain
     TabOrder = 3
     UseDockManager = True
     Visible = False
-    Version = '2.5.8.0'
+    Version = '2.6.0.0'
     AutoHideChildren = False
     BorderColor = 16765615
     Caption.Color = 16316406
@@ -6147,6 +6148,7 @@ object frmMain: TfrmMain
         038DA864C101F049FF7C88ED6CB7A3CC0DB08A641BB989FEB553498E33472EF4
         5586BF734B683F13C02943248F0CE86207FFC637BB3F8B0693F0BB9B00000000
         49454E44AE426082}
+      Rounded = True
       Transparent = True
       ParentShowHint = False
       ShowHint = True
@@ -6238,6 +6240,7 @@ object frmMain: TfrmMain
         86955CDE8D03F81E184566E0FB7EACEF60AF94424AF91D7E8C0D31B82549404A
         89AEEB897020D0374DB3983800E8EBBA7E9C06C3E233E55304028B3F8CFFB20F
         181AC35FEEBABAA70000000049454E44AE426082}
+      Rounded = True
       Transparent = True
       ParentShowHint = False
       ShowHint = True
@@ -6334,6 +6337,7 @@ object frmMain: TfrmMain
         4829D703A457400885C9F305A020B1C6929B7C0AB1AB17373B42F3EDFDB903D0
         EBC5B45A3500BA0FAF4BE64A59919A0140739E7CD7EFFC35002AFE9DAF4FEDB4
         8A0000000049454E44AE426082}
+      Rounded = True
       Transparent = True
       ParentShowHint = False
       ShowHint = True
@@ -6427,6 +6431,7 @@ object frmMain: TfrmMain
         AFE3B49B00C7C698F73F0B32F952018878A5055C0E9FFFFA17C6C051E026995E
         8F3BEDA6A595DCFC05FB2F715C841005E00CB81A07FBF902A493DAEF83942131
         0000000049454E44AE426082}
+      Rounded = True
       Transparent = True
       ParentShowHint = False
       ShowHint = True
@@ -6527,7 +6532,7 @@ object frmMain: TfrmMain
     SimplePanel = False
     SizeGrip = False
     URLColor = clBlue
-    Version = '1.5.2.1'
+    Version = '1.6.0.0'
   end
   object dlgBrowseForSaveFolder: TJvBrowseForFolderDialog
     RootDirectory = fdDesktopDirectory
@@ -6655,7 +6660,8 @@ object frmMain: TfrmMain
   object AdvPopupMenuFilter: TAdvPopupMenu
     Images = ImageList1
     MenuStyler = AdvMenuOfficeStyler1
-    Version = '2.6.6.0'
+    Version = '2.7.1.5'
+    UIStyle = tsCustom
     Left = 568
     Top = 96
   end
@@ -6682,7 +6688,7 @@ object frmMain: TfrmMain
     Instruction = 'Save files as:'
     ExpandControlText = 'More information'
     Options = [doCommandLinks]
-    Version = '2.0.5.2'
+    Version = '2.2.0.0'
     Left = 464
     Top = 104
   end
@@ -8051,6 +8057,35 @@ object frmMain: TfrmMain
         end
         object Menu_SamAndMax_SaveTheWorld_EP6: TMenuItem
           Caption = '106 Bright Side Of The Moon'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+      end
+      object Season22: TMenuItem
+        Caption = 'Beyond Time And Space'
+        ImageIndex = 3
+        object Menu_SamAndMax_BeyondTimeAndSpace_EP1: TMenuItem
+          Caption = '201 Ice Station Santa'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_BeyondTimeAndSpace_EP2: TMenuItem
+          Caption = '202 Moai Better Blues'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_BeyondTimeAndSpace_EP3: TMenuItem
+          Caption = '203 Night Of The Raving Dead'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_BeyondTimeAndSpace_EP4: TMenuItem
+          Caption = '204 Chariots of the Dogs'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_BeyondTimeAndSpace_EP5: TMenuItem
+          Caption = '205 What'#39's New Beelzebub'
           ImageIndex = 3
           OnClick = OpenPopupMenuHandler
         end
