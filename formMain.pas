@@ -33,7 +33,7 @@ uses
   AdvGlowButton, AdvAppStyler, AdvMenus, AdvMenuStylers, HTMLStatusBar, TaskDialog, AdvPanel,
 
   uExplorerbaseunit, uExplorertypes, uTelltaleFuncs, uTelltaleSpeechExtractorConst,
-  System.ImageList, AdvStyleIF;
+  System.ImageList, AdvStyleIF, Vcl.Mask;
 
 type
   TfrmMain = class(TForm)
@@ -268,6 +268,12 @@ type
     Menu_SamAndMax_BeyondTimeAndSpace_EP3: TMenuItem;
     Menu_SamAndMax_BeyondTimeAndSpace_EP2: TMenuItem;
     Menu_SamAndMax_BeyondTimeAndSpace_EP1: TMenuItem;
+    DevilsPlayhouse1: TMenuItem;
+    Menu_SamAndMax_DevilsPlayhouse_EP5: TMenuItem;
+    Menu_SamAndMax_DevilsPlayhouse_EP4: TMenuItem;
+    Menu_SamAndMax_DevilsPlayhouse_EP3: TMenuItem;
+    Menu_SamAndMax_DevilsPlayhouse_EP2: TMenuItem;
+    Menu_SamAndMax_DevilsPlayhouse_EP1: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;

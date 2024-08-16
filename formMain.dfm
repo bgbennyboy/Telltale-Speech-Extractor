@@ -12,7 +12,6 @@ object frmMain: TfrmMain
   Font.Height = -11
   Font.Name = 'Tahoma'
   Font.Style = []
-  OldCreateOrder = False
   Position = poScreenCenter
   ScreenSnap = True
   ShowHint = True
@@ -20,7 +19,6 @@ object frmMain: TfrmMain
   OnCreate = FormCreate
   OnDestroy = FormDestroy
   OnResize = FormResize
-  PixelsPerInch = 96
   TextHeight = 13
   object Tree: TVirtualStringTree
     Left = 0
@@ -3935,6 +3933,23 @@ object frmMain: TfrmMain
       0000000000000000000000000000000000000000000000000000000000000000
       0000000000000000000000000000000000000000000000000000000000000000
       000000000000000000000000000000000000000000000000000000000000}
+    Colors.BorderColor = 15987699
+    Colors.DisabledColor = clGray
+    Colors.DropMarkColor = 15385233
+    Colors.DropTargetColor = 15385233
+    Colors.DropTargetBorderColor = 15385233
+    Colors.FocusedSelectionColor = 15385233
+    Colors.FocusedSelectionBorderColor = 15385233
+    Colors.GridLineColor = 15987699
+    Colors.HeaderHotColor = clBlack
+    Colors.HotColor = clBlack
+    Colors.SelectionRectangleBlendColor = 15385233
+    Colors.SelectionRectangleBorderColor = 15385233
+    Colors.SelectionTextColor = clBlack
+    Colors.TreeLineColor = 9471874
+    Colors.UnfocusedColor = clGray
+    Colors.UnfocusedSelectionColor = clWhite
+    Colors.UnfocusedSelectionBorderColor = clWhite
     DrawSelectionMode = smBlendedRectangle
     Header.AutoSizeIndex = 1
     Header.Height = 18
@@ -3963,14 +3978,14 @@ object frmMain: TfrmMain
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 0
         Text = 'Category'
-        Width = 134
+        Width = 131
       end
       item
         MinWidth = 300
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 1
         Text = 'Annotation'
-        Width = 411
+        Width = 420
       end
       item
         MaxWidth = 60
@@ -3978,7 +3993,7 @@ object frmMain: TfrmMain
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 2
         Text = 'Length'
-        Width = 60
+        Width = 57
       end
       item
         MaxWidth = 150
@@ -3986,7 +4001,7 @@ object frmMain: TfrmMain
         Options = [coAllowClick, coDraggable, coEnabled, coParentBidiMode, coParentColor, coResizable, coShowDropMark, coVisible, coAutoSpring]
         Position = 3
         Text = 'Filename'
-        Width = 150
+        Width = 147
       end>
   end
   object pnlTop: TPanel
@@ -3998,6 +4013,7 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 1
+    ExplicitWidth = 755
     DesignSize = (
       759
       55)
@@ -5425,6 +5441,7 @@ object frmMain: TfrmMain
       TabOrder = 6
       Text = ''
       OnChange = editFindChange
+      ExplicitWidth = 183
     end
     object btnShowAnnotationPanel: TAdvGlowButton
       Left = 402
@@ -6005,7 +6022,7 @@ object frmMain: TfrmMain
     TabOrder = 3
     UseDockManager = True
     Visible = False
-    Version = '2.6.0.0'
+    Version = '2.6.3.4'
     AutoHideChildren = False
     BorderColor = 16765615
     Caption.Color = 16316406
@@ -6041,6 +6058,8 @@ object frmMain: TfrmMain
     Styler = AdvPanelStyler1
     Text = ''
     OnMinimize = pnlBottomMinimize
+    ExplicitTop = 311
+    ExplicitWidth = 755
     DesignSize = (
       759
       103)
@@ -6065,6 +6084,7 @@ object frmMain: TfrmMain
       LabelSpacing = 2
       ReadOnly = True
       TabOrder = 1
+      Text = ''
     end
     object comboboxAnnotCategory: TJvHTComboBox
       Left = 479
@@ -6093,8 +6113,10 @@ object frmMain: TfrmMain
       Enabled = False
       LabelSpacing = 2
       TabOrder = 0
+      Text = ''
       OnExit = editAnnotAnnotationExit
       OnKeyPress = editAnnotAnnotationKeyPress
+      ExplicitWidth = 485
     end
     object btnAnnotAddCategory: TAdvGlowButton
       Left = 9
@@ -6532,7 +6554,9 @@ object frmMain: TfrmMain
     SimplePanel = False
     SizeGrip = False
     URLColor = clBlue
-    Version = '1.6.0.0'
+    Version = '1.6.1.1'
+    ExplicitTop = 414
+    ExplicitWidth = 755
   end
   object dlgBrowseForSaveFolder: TJvBrowseForFolderDialog
     RootDirectory = fdDesktopDirectory
@@ -6660,7 +6684,7 @@ object frmMain: TfrmMain
   object AdvPopupMenuFilter: TAdvPopupMenu
     Images = ImageList1
     MenuStyler = AdvMenuOfficeStyler1
-    Version = '2.7.1.5'
+    Version = '2.7.1.12'
     UIStyle = tsCustom
     Left = 568
     Top = 96
@@ -6688,7 +6712,7 @@ object frmMain: TfrmMain
     Instruction = 'Save files as:'
     ExpandControlText = 'More information'
     Options = [doCommandLinks]
-    Version = '2.2.0.0'
+    Version = '2.2.3.2'
     Left = 464
     Top = 104
   end
@@ -8086,6 +8110,35 @@ object frmMain: TfrmMain
         end
         object Menu_SamAndMax_BeyondTimeAndSpace_EP5: TMenuItem
           Caption = '205 What'#39's New Beelzebub'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+      end
+      object DevilsPlayhouse1: TMenuItem
+        Caption = 'Devil'#39's Playhouse'
+        ImageIndex = 3
+        object Menu_SamAndMax_DevilsPlayhouse_EP1: TMenuItem
+          Caption = '301 The Penal Zone'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_DevilsPlayhouse_EP2: TMenuItem
+          Caption = '302 The Tomb of Sammun-Mak'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_DevilsPlayhouse_EP3: TMenuItem
+          Caption = '303 They Stole Max'#39's Brain!'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_DevilsPlayhouse_EP4: TMenuItem
+          Caption = '304 Beyond the Alley of the Dolls'
+          ImageIndex = 3
+          OnClick = OpenPopupMenuHandler
+        end
+        object Menu_SamAndMax_DevilsPlayhouse_EP5: TMenuItem
+          Caption = '305 The City That Dares Not Sleep'
           ImageIndex = 3
           OnClick = OpenPopupMenuHandler
         end

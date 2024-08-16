@@ -124,6 +124,11 @@ const
   SamAndMaxBeyondTimeAndSpace_EP3_Bundle = 'SM2_pc_SamMax203_uncompressed.ttarch2';
   SamAndMaxBeyondTimeAndSpace_EP4_Bundle = 'SM2_pc_SamMax204_uncompressed.ttarch2';
   SamAndMaxBeyondTimeAndSpace_EP5_Bundle = 'SM2_pc_SamMax205_uncompressed.ttarch2';
+  SamAndMaxDevilsPlayhouse_EP1_Bundle = 'SM3_pc_SamMax301_uncompressed.ttarch2';
+  SamAndMaxDevilsPlayhouse_EP2_Bundle = 'SM3_pc_SamMax302_uncompressed.ttarch2';
+  SamAndMaxDevilsPlayhouse_EP3_Bundle = 'SM3_pc_SamMax303_uncompressed.ttarch2';
+  SamAndMaxDevilsPlayhouse_EP4_Bundle = 'SM3_pc_SamMax304_uncompressed.ttarch2';
+  SamAndMaxDevilsPlayhouse_EP5_Bundle = 'SM3_pc_SamMax305_uncompressed.ttarch2';
 var
   FileNames: TStringList;
   i: integer;
@@ -277,6 +282,12 @@ begin
       SamAndMax_BeyondTimeAndSpace_EP3:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP3_Bundle;
       SamAndMax_BeyondTimeAndSpace_EP4:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP4_Bundle;
       SamAndMax_BeyondTimeAndSpace_EP5:           BundleFileName := SamAndMaxBeyondTimeAndSpace_EP5_Bundle;
+      SamAndMax_DevilsPlayhouse_EP1:              BundleFileName := SamAndMaxDevilsPlayhouse_EP1_Bundle;
+      SamAndMax_DevilsPlayhouse_EP2:              BundleFileName := SamAndMaxDevilsPlayhouse_EP2_Bundle;
+      SamAndMax_DevilsPlayhouse_EP3:              BundleFileName := SamAndMaxDevilsPlayhouse_EP3_Bundle;
+      SamAndMax_DevilsPlayhouse_EP4:              BundleFileName := SamAndMaxDevilsPlayhouse_EP4_Bundle;
+      SamAndMax_DevilsPlayhouse_EP5:              BundleFileName := SamAndMaxDevilsPlayhouse_EP5_Bundle;
+
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);

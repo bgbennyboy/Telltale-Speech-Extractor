@@ -1,10 +1,10 @@
 ﻿# Telltale Speech Extractor
-Version 1.4.3<br>By Bennyboy<br>[Quick and Easy Software](https://quickandeasysoftware.net/)
+Version 1.4.4<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
   
-A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max Save the World.
+A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max remasters.
 
 ## New in this version
--  Added support for Sam and Max Beyond Time And Space
+-  Added support for Sam and Max The Devil's Playhouse.
   
  ## What do I need to use this?  
 Just the games themselves.
@@ -61,6 +61,7 @@ All games released so far by Telltale and Skunkape Games. Thats:
 -   Sam and Max: Season 3
 -   Sam and Max Save the World
 -   Sam and Max Beyond Time And Space
+-	Sam and Max The Devil's Playhouse
 -   Strong Bad: Season 1
 -   Tales From The Borderlands
 -   Tales Of Monkey Island
@@ -153,7 +154,6 @@ To summarise, here is the crazy array of formats and containers that this progra
     
 -   [JEDI Code Library](http://sourceforge.net/projects/jcl)  
     
-  
 -   [JEDI Visual Code Library](http://homepages.codegear.com/jedi/jvcl)  
     
 -   MP3FileUtils by [Daniel Gaussmann](http://www.gausi.de)  
@@ -175,10 +175,10 @@ To summarise, here is the crazy array of formats and containers that this progra
     
 
 ## Support: 
-[Contact me](http://quickandeasysoftware.net/contact).  
+[Contact me](https://quickandeasysoftware.net/contact).  
   
-All my software is completely free. If you find this program useful please consider making a donation. This can be done on my [website.](http://quickandeasysoftware.net)
+All my software is completely free. If you find this program useful please consider making a donation. This can be done on my [website.](https://quickandeasysoftware.net)
 
   
 
-Last updated 12/12/21
+Last updated 15/08/24
