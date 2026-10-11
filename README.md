@@ -1,10 +1,18 @@
 ﻿# Telltale Speech Extractor
-Version 1.4.5<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
+Version 1.4.6<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
   
 A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max remasters.
 
 ## New in this version
--  Added support for Poker Night at the Inventory Remastered.
+-  Fixed The Walking Dead: The Definitive Series. Five episodes weren't showing the speech annotations, this was due to slight changes in some of the filenames in the archives.
+- Lots of fixes to the annotation files including: 
+	- Mispelt character names such as Gubyrush, Gerrry, Sorink, Yorder, Niima. These actually came from the games themselves.
+	- Fixed lost characters shown as '?' in about 2800 lines. These should have been apostrophes, quotes, ellipses, dashes etc and all now show correctly.
+	- Made category/character names  consistent across episodes, eg WhackARat, Computervoice.
+	- Tales From The Borderlands E3 Demo, some entries had the name and sound length reversed.
+	- Fix some garbled characters in Game Of Thrones 102/103 and Minecraft 107.
+	- Added new WallaceAndGromit_Global annotation file for the global_pc_voice.ttarch archives in The Last Resort, Muzzled and The Bogey Man.
+	- Collapsed double spaces and removed stray spaces before punctuation in all annotations.
   
  ## What do I need to use this?  
 Just the games themselves.
@@ -182,4 +190,4 @@ All my software is completely free. If you find this program useful please consi
 
   
 
-Last updated 07/03/26
+Last updated 11/10/26
