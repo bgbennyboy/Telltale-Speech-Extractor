@@ -1,10 +1,10 @@
 ﻿# Telltale Speech Extractor
-Version 1.4.4<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
+Version 1.4.5<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
   
 A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max remasters.
 
 ## New in this version
--  Added support for Sam and Max The Devil's Playhouse.
+-  Added support for Poker Night at the Inventory Remastered.
   
  ## What do I need to use this?  
 Just the games themselves.
@@ -55,6 +55,7 @@ All games released so far by Telltale and Skunkape Games. Thats:
 -   Minecraft Story mode: Season 2
 -   Nelson Tethers - Puzzle Agent
 -   Poker Night At The Inventory
+-   Poker Night At The Inventory Remastered
 -   Poker Night 2
 -   Sam and Max: Season 1
 -   Sam and Max: Season 2
@@ -181,4 +182,4 @@ All my software is completely free. If you find this program useful please consi
 
   
 
-Last updated 15/08/24
+Last updated 07/03/26

@@ -390,13 +390,13 @@ var
 begin
   OpusTag := TOpusTag.Create;
   try
-  OpusTag.SetTextFrameText('TITLE', Title);
-  OpusTag.SetTextFrameText('ALBUM', Album);
-  OpusTag.SetTextFrameText('ARTIST', Artist);
-  OpusTag.SetTextFrameText('GENRE', 'Game');
-  OpusTag.SetTextFrameText('Year', Year);
-  OpusTag.SetTextFrameText('Album Artist', 'Telltale Games');
-  OpusTag.SetTextFrameText('COMMENT', 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com');
+  OpusTag.SetText('TITLE', Title);
+  OpusTag.SetText('ALBUM', Album);
+  OpusTag.SetText('ARTIST', Artist);
+  OpusTag.SetText('GENRE', 'Game');
+  OpusTag.SetText('Year', Year);
+  OpusTag.SetText('Album Artist', 'Telltale Games');
+  OpusTag.SetText('COMMENT', 'Created with Telltale Speech Extractor. Http://quick.mixnmojo.com');
   OpusTag.SaveToFile(FileName);
   finally
     OpusTag.Free;

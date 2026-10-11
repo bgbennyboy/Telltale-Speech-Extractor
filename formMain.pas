@@ -274,6 +274,8 @@ type
     Menu_SamAndMax_DevilsPlayhouse_EP3: TMenuItem;
     Menu_SamAndMax_DevilsPlayhouse_EP2: TMenuItem;
     Menu_SamAndMax_DevilsPlayhouse_EP1: TMenuItem;
+    Menu_PokerNight_Inventory_Remastered: TMenuItem;
+    Menu_PokerNight_Inventory_Remastered_Uncensored: TMenuItem;
     procedure FormDestroy(Sender: TObject);
     procedure FormCreate(Sender: TObject);
     procedure TreeGetNodeDataSize(Sender: TBaseVirtualTree;

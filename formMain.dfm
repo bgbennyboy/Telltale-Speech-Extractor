@@ -4013,7 +4013,6 @@ object frmMain: TfrmMain
     BevelOuter = bvNone
     ParentBackground = False
     TabOrder = 1
-    ExplicitWidth = 755
     DesignSize = (
       759
       55)
@@ -4457,8 +4456,10 @@ object frmMain: TfrmMain
       TabOrder = 0
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -4484,6 +4485,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Layout = blGlyphTop
       DropDownButton = True
       DropDownSplit = False
@@ -4586,8 +4591,10 @@ object frmMain: TfrmMain
       OnClick = btnSaveSingleAudioClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -4613,6 +4620,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
       Layout = blGlyphTop
     end
@@ -4708,8 +4719,10 @@ object frmMain: TfrmMain
       OnClick = btnSaveAllAudioClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -4735,6 +4748,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
       Layout = blGlyphTop
     end
@@ -4993,8 +5010,10 @@ object frmMain: TfrmMain
       OnClick = btnPlaySoundClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -5020,6 +5039,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
       Layout = blGlyphTop
     end
@@ -5389,8 +5412,10 @@ object frmMain: TfrmMain
       TabOrder = 4
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -5416,6 +5441,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
       Layout = blGlyphTop
       DropDownButton = True
@@ -5441,7 +5470,6 @@ object frmMain: TfrmMain
       TabOrder = 6
       Text = ''
       OnChange = editFindChange
-      ExplicitWidth = 183
     end
     object btnShowAnnotationPanel: TAdvGlowButton
       Left = 402
@@ -5670,8 +5698,10 @@ object frmMain: TfrmMain
       OnClick = btnShowAnnotationPanelClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -5697,6 +5727,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
       Layout = blGlyphTop
       Style = bsCheck
@@ -5973,8 +6007,10 @@ object frmMain: TfrmMain
       OnClick = btnAboutClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -6000,6 +6036,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Layout = blGlyphTop
     end
   end
@@ -6022,7 +6062,7 @@ object frmMain: TfrmMain
     TabOrder = 3
     UseDockManager = True
     Visible = False
-    Version = '2.6.3.4'
+    Version = '2.7.0.1'
     AutoHideChildren = False
     BorderColor = 16765615
     Caption.Color = 16316406
@@ -6058,8 +6098,6 @@ object frmMain: TfrmMain
     Styler = AdvPanelStyler1
     Text = ''
     OnMinimize = pnlBottomMinimize
-    ExplicitTop = 311
-    ExplicitWidth = 755
     DesignSize = (
       759
       103)
@@ -6116,7 +6154,6 @@ object frmMain: TfrmMain
       Text = ''
       OnExit = editAnnotAnnotationExit
       OnKeyPress = editAnnotAnnotationKeyPress
-      ExplicitWidth = 485
     end
     object btnAnnotAddCategory: TAdvGlowButton
       Left = 9
@@ -6178,8 +6215,10 @@ object frmMain: TfrmMain
       OnClick = btnAnnotAddCategoryClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -6205,6 +6244,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
     end
     object btnAnnotClearCategorySelection: TAdvGlowButton
@@ -6270,8 +6313,10 @@ object frmMain: TfrmMain
       OnClick = btnAnnotClearCategorySelectionClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -6297,6 +6342,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
     end
     object btnAnnotSaveChanges: TAdvGlowButton
@@ -6367,8 +6416,10 @@ object frmMain: TfrmMain
       OnClick = btnAnnotSaveChangesClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -6394,6 +6445,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
     end
     object btnAnnotUndoChanges: TAdvGlowButton
@@ -6461,8 +6516,10 @@ object frmMain: TfrmMain
       OnClick = btnAnnotUndoChangesClick
       Appearance.BorderColor = 13421257
       Appearance.BorderColorHot = 10079963
+      Appearance.BorderColorCheckedHot = 11565130
       Appearance.BorderColorDown = 4548219
       Appearance.BorderColorChecked = 4548219
+      Appearance.BorderColorDisabled = 13948116
       Appearance.Color = 15987697
       Appearance.ColorTo = 16119283
       Appearance.ColorChecked = 11918331
@@ -6488,6 +6545,10 @@ object frmMain: TfrmMain
       Appearance.GradientDown = ggVertical
       Appearance.GradientMirrorDown = ggVertical
       Appearance.GradientChecked = ggVertical
+      Appearance.TextColorChecked = 3750459
+      Appearance.TextColorDown = 2303013
+      Appearance.TextColorHot = 2303013
+      Appearance.TextColorDisabled = 13948116
       Enabled = False
     end
   end
@@ -6555,8 +6616,6 @@ object frmMain: TfrmMain
     SizeGrip = False
     URLColor = clBlue
     Version = '1.6.1.1'
-    ExplicitTop = 414
-    ExplicitWidth = 755
   end
   object dlgBrowseForSaveFolder: TJvBrowseForFolderDialog
     RootDirectory = fdDesktopDirectory
@@ -6712,7 +6771,7 @@ object frmMain: TfrmMain
     Instruction = 'Save files as:'
     ExpandControlText = 'More information'
     Options = [doCommandLinks]
-    Version = '2.2.3.2'
+    Version = '2.2.3.3'
     Left = 464
     Top = 104
   end
@@ -7938,6 +7997,16 @@ object frmMain: TfrmMain
       end
       object Menu_PokerNight_2: TMenuItem
         Caption = 'Poker Night 2'
+        ImageIndex = 4
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_PokerNight_Inventory_Remastered: TMenuItem
+        Caption = 'Poker Night At The Inventory Remastered'
+        ImageIndex = 4
+        OnClick = OpenPopupMenuHandler
+      end
+      object Menu_PokerNight_Inventory_Remastered_Uncensored: TMenuItem
+        Caption = 'Poker Night At The Inventory Remastered (Uncensored)'
         ImageIndex = 4
         OnClick = OpenPopupMenuHandler
       end

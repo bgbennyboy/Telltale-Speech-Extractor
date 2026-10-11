@@ -78,13 +78,22 @@ begin
         if sr.Attr and faSysFile = faSysFile then
         else
         begin
-          if extractfileext(sr.Name)='.annot' then
+          if SameText(extractfileext(sr.Name), '.annot') then
             filelist.Add(sr.Name);
         end;
       end;
     until FindNext(SR) <> 0;
     FindClose(SR);
   end;
+end;
+
+{Ordinal, case-insensitive order - the same order NTFS lists the folder in.
+ Some annotations are subsets of another (demos, JesseMale, Uncensored), so
+ their unique files also appear in the full game. The full game's annotation
+ must be checked first, which this order guarantees on any drive.}
+function CompareAnnotationNames(List: TStringList; Index1, Index2: Integer): Integer;
+begin
+  result:=CompareStr(UpperCase(List[Index1]), UpperCase(List[Index2]));
 end;
 
 function TAnnotationManager.FindMatchingIniFile: string;
@@ -97,6 +106,7 @@ begin
   AnnotationFiles:=TStringList.Create;
   try
     ListFileDir(FAnnotationDir, AnnotationFiles);
+    AnnotationFiles.CustomSort(CompareAnnotationNames);
 
     result:='';
     if AnnotationFiles.Count=0 then exit;
@@ -129,7 +139,9 @@ end;
 function TAnnotationManager.CheckForUniqueFiles(Folder, UniqueFile1,
   UniqueFile2, UniqueFile3: string): boolean;
 var
-  FoundCount, i: integer;
+  Found1, Found2, Found3: boolean;
+  i: integer;
+  Name: string;
 begin
   if UniqueFile1='' then //They are all unique but if this is blank then
   begin                  //the others probably will be
@@ -137,20 +149,22 @@ begin
     exit;
   end;
 
-  FoundCount:=0;
+  {Each unique file is tracked separately, so an archive holding the same name
+   twice (eg x.vox and x.anm) can't make up for a missing one. Names are
+   compared case-insensitively, as TMemIniFile does with section names.}
+  Found1:=false;
+  Found2:=false;
+  Found3:=false;
 
   for i := 0 to fBundleReader.FilesCount - 1 do
   begin
-    if (PathRemoveExtension(fBundleReader.FileNames[i]) = UniqueFile1) or
-       (PathRemoveExtension(fBundleReader.FileNames[i]) = UniqueFile2) or
-       (PathRemoveExtension(fBundleReader.FileNames[i]) = UniqueFile3) then
-        inc(FoundCount);
+    Name:=PathRemoveExtension(fBundleReader.FileNames[i]);
+    if SameText(Name, UniqueFile1) then Found1:=true;
+    if SameText(Name, UniqueFile2) then Found2:=true;
+    if SameText(Name, UniqueFile3) then Found3:=true;
   end;
 
-  if FoundCount>=3 then
-    result:=true
-  else
-    result:=false;
+  result:=Found1 and Found2 and Found3;
 end;
 
 procedure TAnnotationManager.LoadIniIntoStringLists;
@@ -228,7 +242,7 @@ begin
     Exit;
   end;
 
-  if (Index < 0) or (Index > FAnnot_Sections.Count) then
+  if (Index < 0) or (Index >= FAnnot_Sections.Count) then
   begin
     Result:='';
     Exit;
@@ -258,7 +272,7 @@ begin
     Exit;
   end;
 
-  if Index > FAnnot_Sections.Count then
+  if (Index < 0) or (Index >= FAnnot_Sections.Count) then
   begin
     Exit;
   end;

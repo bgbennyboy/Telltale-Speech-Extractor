@@ -129,6 +129,8 @@ const
   SamAndMaxDevilsPlayhouse_EP3_Bundle = 'SM3_pc_SamMax303_uncompressed.ttarch2';
   SamAndMaxDevilsPlayhouse_EP4_Bundle = 'SM3_pc_SamMax304_uncompressed.ttarch2';
   SamAndMaxDevilsPlayhouse_EP5_Bundle = 'SM3_pc_SamMax305_uncompressed.ttarch2';
+  PokerNight_Inventory_Remastered_Bundle = 'CP_pc_Common_uncompressed.ttarch2';
+  PokerNight_Inventory_Remastered_Uncensored_Bundle = 'CP_pc_Uncensored_uncompressed.ttarch2';
 var
   FileNames: TStringList;
   i: integer;
@@ -287,7 +289,8 @@ begin
       SamAndMax_DevilsPlayhouse_EP3:              BundleFileName := SamAndMaxDevilsPlayhouse_EP3_Bundle;
       SamAndMax_DevilsPlayhouse_EP4:              BundleFileName := SamAndMaxDevilsPlayhouse_EP4_Bundle;
       SamAndMax_DevilsPlayhouse_EP5:              BundleFileName := SamAndMaxDevilsPlayhouse_EP5_Bundle;
-
+      PokerNight_Inventory_Remastered:            BundleFileName := PokerNight_Inventory_Remastered_Bundle;
+      PokerNight_Inventory_Remastered_Uncensored: BundleFileName :=PokerNight_Inventory_Remastered_Uncensored_Bundle
     end;
 
     ListFilesInDirByExt(Folder, '.ttarch2', FileNames);
