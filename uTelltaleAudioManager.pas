@@ -26,6 +26,11 @@ type
     FT_UNKNOWN
   );
 
+  TVoxHeader = record
+    Encrypted: boolean;
+    DataBlockSize, FrameSize, SampleRate, SpeexMode, PacketCount: integer;
+  end;
+
   TTelltaleAudioManager = class
   private
     fAudioFile: TStream;
@@ -33,10 +38,9 @@ type
     fAudioPlayer: TTelltaleAudioPlayback;
     fOnDebug: TDebugEvent;
     fOnProgress: TProgressEvent;
-    fVoxKeyCheckDone: boolean;
     fEncryptionKey: string;
     fResFileMgr: TEmbeddedResFileManager;
-    function DecodeVOXSpeex(Source, Dest: TStream): boolean;
+    function DecodeVOXSpeex(Source, Dest: TStream; const Header: TVoxHeader): boolean;
     function SaveOggToStream(DestStream: TStream): boolean;
     function SaveVoxToStream(AStream: TStream): boolean;
     function SaveFSBToStream(DestStream: TMemoryStream): boolean;
@@ -54,7 +58,7 @@ type
     procedure AddID3V2TagsToMP3(Stream: TStream; Title, Artist, Album, Year: string);
     procedure Log(Text: string);
     procedure ReadHeader;
-    procedure GetVOXInfo(Stream: TStream; var NoChannels: integer; var WavSampleRate: integer);
+    function ReadVoxHeader(Stream: TStream): TVoxHeader;
     procedure CheckVoxEncryption(TestData: TStream);
     procedure DecryptVoxPacketAndWriteToByteArray(Source: TStream; var Dest: array of byte; PacketSize, IndexInDest: integer);
     procedure SaveFixedMP3Stream(InStream, OutStream: TStream; FileSize, Channels: integer);
@@ -96,10 +100,11 @@ var
   strTemp: ansistring;
 begin
   OriginalPos := TestData.Position;
+  fEncryptionKey := '';
 
   Dest := TMemoryStream.Create;
   try
-    for I := 0 to High(EncryptionKeys) - 1 do
+    for I := 0 to High(EncryptionKeys) do
     begin
       Dest.Clear;
       TestData.Position := OriginalPos;
@@ -117,7 +122,7 @@ begin
     end;
   finally
     Dest.Free;
-    fVoxKeyCheckDone := true;
+    TestData.Position := OriginalPos;
   end;
 
 end;
@@ -150,8 +155,6 @@ begin
   except on EBASSAudioException do
     raise;
   end;
-
-  fVoxKeyCheckDone := false;
 
   if Assigned(fOnDebug) then
     fAudioPlayer.OnDebug := fOnDebug;
@@ -403,91 +406,67 @@ begin
   end;
 end;
 
-procedure TTelltaleAudioManager.GetVOXInfo(Stream: TStream; var NoChannels: integer; var WavSampleRate: integer);
+{Reads the VoiceData header. Leaves the stream positioned at the packet offset table.
+ V1 (NIBM): 'NIBM', class count, class name length, 'class VoiceData', version crc
+ V2 (ERTM): 'ERTM', class count, class name crc64, version crc
+ Then both have the same VoiceData fields - see VOX_Findings.md}
+function TTelltaleAudioManager.ReadVoxHeader(Stream: TStream): TVoxHeader;
 var
-  i, SmpRate, Channels: integer;
+  i: integer;
+  EncFlag: AnsiChar;
+  HasTableSize: boolean;
 begin
-  if fAudioFile = nil then exit;
-
-
-  Stream.Seek(8, sofrombeginning); //NIBM and Version
-
   if Ffiletype=FT_SPEEX_V1 then
   begin
-    Stream.Read(i, 4); //text length
-    Stream.Seek(i, soFromCurrent); //text
-  end;
-
-  if Ffiletype=FT_SPEEX_V2 then
-  begin
-    Stream.Seek(8, sofromcurrent); //8 unknown bytes
-  end;
-
-  Stream.Seek(17, sofromcurrent); //1 unknown bytes + 8 unknown bytes + Total Size of Data block + bytes per frame?
-  Stream.Read(SmpRate, 4); //Samplerate
-  Stream.Read(Channels, 4); //No Channels
-  if Channels = 2 then
-    NoChannels:=2
+    Stream.Seek(8, sofrombeginning); //NIBM and class count
+    Stream.Read(i, 4); //class name length
+    Stream.Seek(i + 4, soFromCurrent); //class name + version crc
+    HasTableSize := true;
+  end
   else
-    NoChannels:=1;
-
-  case SmpRate of
-    {32000:  WavSampleRate:=8000;
-    44100:  WavSampleRate:=11025;
-    22050:  WavSampleRate:=16000;}
-    32000:  WavSampleRate:=16000;
-    44100:  WavSampleRate:=22050;
-    22050:  WavSampleRate:=11025;
-    else
-    Log('Unknown Samplerate!!! ' + inttostr(SmpRate));
+  begin
+    {Most V2 files have a packet table size DWORD before the packet count.
+     If present then offset 49 is the first packet offset, which is always 0.
+     If not (eg Tales of Monkey Island Wii) then it's the 2nd packet offset}
+    Stream.Seek(49, soFromBeginning);
+    Stream.Read(i, 4);
+    HasTableSize := i = 0;
+    Stream.Seek(20, soFromBeginning); //ERTM, class count, crc64, version crc
   end;
+
+  Stream.Read(EncFlag, 1);
+  Result.Encrypted := EncFlag = '1'; //If set then packet 0 and every 64th packet are encrypted
+  Stream.Seek(4, soFromCurrent); //Duration (float)
+  Stream.Read(Result.DataBlockSize, 4);
+  Stream.Read(Result.FrameSize, 4); //160 NB, 320 WB, 640 UWB
+  Stream.Read(Result.SampleRate, 4); //Actual output sample rate
+  Stream.Read(Result.SpeexMode, 4); //0 NB, 1 WB, 2 UWB. Not the no of channels!
+  if HasTableSize then
+    Stream.Seek(4, soFromCurrent); //Packet table size in bytes
+  Stream.Read(Result.PacketCount, 4);
 end;
 
-function TTelltaleAudioManager.DecodeVOXSpeex(Source, Dest: TStream): boolean;
+function TTelltaleAudioManager.DecodeVOXSpeex(Source, Dest: TStream; const Header: TVoxHeader): boolean;
 var
   i, j, k: integer;
-  StartOfData, DataBlockSize, ArrayLength, NoChannels, Enhance, DecFrame: integer;
+  StartOfData, ArrayLength, Enhance, DecFrame: integer;
   decbits: TSpeexBits;
   decstate: PSpeexState;
-  Stereo: TSpeexStereoState;
-  buffDec: array of pSmallInt; //MUST be pSmallInt or get errors
+  buffDec: array of SmallInt;
   sourceBytes: array of byte;
   SizesArray: array of integer;
-  ContainsSampleDataOffset: boolean;
 begin
   Result := false;
-  ContainsSampleDataOffset := false;
 
-  if Ffiletype=FT_SPEEX_V1 then
+  if (Header.SpeexMode < 0) or (Header.SpeexMode > 2) then //NB, WB, UWB
   begin
-    ContainsSampleDataOffset := true;
-    Source.Seek(8, sofrombeginning); //NIBM and Version
-    Source.Read(i, 4); //text length
-    Source.Seek(i, soFromCurrent); //text
-
-    Source.Seek(9, sofromcurrent);
+    Log('Unknown Speex mode ' + inttostr(Header.SpeexMode));
+    exit;
   end;
 
-  if Ffiletype=FT_SPEEX_V2 then
-  begin
-    Source.Seek(49, soFromBeginning);
-    {Newer formats dont seem to have the SampleDataOffset DWORD
-     so need to check which type it is. Easiest way is to check
-     the first DWORD of the packet records - its always 0}
-    Source.Read(i, 4);
-    if i = 0 then
-      ContainsSampleDataOffset := true;
-
-    Source.Seek(25, soFromBeginning);
-  end;
-
-  Source.Read(DataBlockSize, 4); //Data block size
-  Source.Seek(8, sofromcurrent);
-  Source.Read(NoChannels, 4); //No Channels
-  if ContainsSampleDataOffset then // Has the extra Dword
-    Source.Seek(4, sofromcurrent);
-  Source.Read(ArrayLength, 4); //No of packet records
-  StartOfData :=  Source.Size - DataBlockSize;
+  ReadVoxHeader(Source); //Position stream at the packet offset table
+  ArrayLength := Header.PacketCount;
+  StartOfData :=  Source.Size - Header.DataBlockSize;
 
   //Sanity check and corrections for bloody Atari version of SamNMax - thats the version TT has for download from their site now.
   //The datablocksize and offset are out by 1 byte
@@ -545,14 +524,19 @@ begin
 
    Bottom line - encryption is only needed for CSI 3 Dimensions of murder and the
    original releases of Sam and Max Season 1
+
+   Update: whether a file is encrypted is stored per file in the header (the
+   Encrypted flag). Some otherwise unencrypted games (Bone 1 + 2, S+M 106, S+M 203)
+   still contain a few encrypted files, so the key check is done per file.
    *****************************************************************************}
 
 
-  //The encryption check is only done once and then the key cached
-  if fVoxKeyCheckDone = false then
+  if Header.Encrypted then
   begin
     Source.Position:=StartOfData;
     CheckVoxEncryption(Source);
+    if fEncryptionKey = '' then
+      Log('VOX file is encrypted but no matching key was found');
   end;
 
   {Decrypt the encrypted packets and write them back to SourceBytes
@@ -561,13 +545,13 @@ begin
    This scans through the packets, reads the packet data from the source stream
    and writes it back to the SourceBytes array that is used by Speex later.
   }
-  if (fEncryptionKey > '') and (ArrayLength > 63) then //Needs to be encrypted and be big enough to have encrypted packets
+  if Header.Encrypted and (fEncryptionKey > '') and (ArrayLength > 63) then //Needs to be encrypted and be big enough to have encrypted packets
   begin
     J:=0;
     Source.Position:=StartOfData; //Need stream to use with BlowfishDecrypt
     for I := 0 to ArrayLength - 1 do
     begin
-      if (fEncryptionKey > '') and (i mod 64 = 0) then
+      if i mod 64 = 0 then
       begin
         DecryptVoxPacketAndWriteToByteArray(Source, SourceBytes, SizesArray[i], j);
       end;
@@ -583,18 +567,12 @@ begin
 
   //Setup Speex parameters
   speex_bits_init (@decbits);
-  decstate:= speex_decoder_init (speex_lib_get_mode (SPEEX_MODEID_WB {SPEEX_MODEID_NB})); //initialise decoder
+  decstate:= speex_decoder_init (speex_lib_get_mode (Header.SpeexMode)); //initialise decoder in the mode the file was encoded with
   speex_decoder_ctl (decstate, SPEEX_GET_FRAME_SIZE, @decframe); //get frame size
+  if decframe <> Header.FrameSize then
+    Log('Speex frame size ' + inttostr(decframe) + ' doesnt match header frame size ' + inttostr(Header.FrameSize));
   Enhance:=1;
   speex_decoder_ctl (decstate, SPEEX_SET_ENH, @Enhance); //set enhancement on
-
-  {SPEEX_STEREO_STATE_INIT - not present in delphi wrapper or this dll}
-  Stereo.balance:=1.0;
-  Stereo.e_ratio:=0.5;
-  Stereo.smooth_left:=1;
-  Stereo.smooth_right:=1;
-  Stereo.reserved1:=0;
-  Stereo.reserved2:=0;
 
 
   J:=sizesarray[0]; //skip the first packet - its the 'encoded by speex' string
@@ -609,17 +587,7 @@ begin
       K:= speex_decode_int (decstate, @decbits, @buffDec[0]); //return 0 for no error, -1 for end of stream, -2 corrupt stream
 
       if K = 0 then // a decoded frame
-      begin
-        if NoChannels=2 then
-        begin
-          speex_decode_stereo_int(@buffDec[0], decframe, @Stereo);
-          Dest.WriteBuffer (buffDec[0], (decframe*4));
-        end
-        else
-        begin
-          Dest.WriteBuffer (buffDec[0], (decframe*2));
-        end;
-      end;
+        Dest.WriteBuffer (buffDec[0], (decframe*2));
 
     until K <> 0;
   end;
@@ -1093,16 +1061,16 @@ end;
 
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;
 var
-  TheSamplerate, TheNoChannels: integer;
+  Header: TVoxHeader;
   WaveStream: TWaveStream;
 begin
   Result:=false;
   if fAudioFile = nil then exit;
   AStream.Position:=0;
-  GetVOXInfo(FAudioFile, TheNoChannels, TheSamplerate);
-  WaveStream:=TWaveStream.Create(AStream, TheNoChannels, 16, TheSamplerate);
+  Header := ReadVoxHeader(FAudioFile);
+  WaveStream:=TWaveStream.Create(AStream, 1, 16, Header.SampleRate); //Mono - stereo is only stored in-band and isn't supported yet
   try
-    Result := DecodeVOXSpeex(FAudioFile, WaveStream);
+    Result := DecodeVOXSpeex(FAudioFile, WaveStream, Header);
   finally
     WaveStream.Free;
   end;
@@ -1266,3 +1234,4 @@ begin
 end;
 
 end.
+
