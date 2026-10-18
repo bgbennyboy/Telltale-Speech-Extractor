@@ -278,6 +278,12 @@ begin
   if Source.Size = 0 then exit;
 
   AudioHandle := BASS_StreamCreateFile(True, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
+  if AudioHandle = 0 then
+  begin
+    Log('BASS couldnt open the audio for decoding. Error code: ' + inttostr(BASS_ErrorGetCode));
+    exit;
+  end;
+
   try
     BASS_ChannelGetInfo(AudioHandle, ChanInfo);
     Channels := chaninfo.chans;
@@ -293,6 +299,8 @@ begin
       while (BASS_ChannelIsActive(AudioHandle) > 0) do
       begin
         BytesRead := BASS_ChannelGetData(AudioHandle, @buf, 10000);
+        if BytesRead <= 0 then
+          break; //Decoding from memory so no more data will arrive
         WaveStream.Write(buf, BytesRead);
       end;
 
@@ -409,7 +417,7 @@ end;
 {Reads the VoiceData header. Leaves the stream positioned at the packet offset table.
  V1 (NIBM): 'NIBM', class count, class name length, 'class VoiceData', version crc
  V2 (ERTM): 'ERTM', class count, class name crc64, version crc
- Then both have the same VoiceData fields - see VOX_Findings.md}
+ Then both have the same VoiceData fields}
 function TTelltaleAudioManager.ReadVoxHeader(Stream: TStream): TVoxHeader;
 var
   i: integer;
