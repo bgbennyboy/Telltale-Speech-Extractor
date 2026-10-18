@@ -70,7 +70,7 @@ begin
     AudioStream.Position := 0;
     fAudioStream.CopyFrom(AudioStream, AudioStream.Size);
     fAudioStream.Position:=0;
-    fAudioHandle := BASS_StreamCreateFile(True, fAudioStream.Memory, 0, fAudioStream.Size, BASS_UNICODE);
+    fAudioHandle := BASS_StreamCreateFile(BASS_FILE_MEM, fAudioStream.Memory, 0, fAudioStream.Size, BASS_UNICODE);
 
 		if not BASS_ChannelPlay(fAudioHandle, True) then
     begin

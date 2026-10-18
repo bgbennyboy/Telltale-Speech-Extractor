@@ -277,7 +277,7 @@ begin
   Result := False;
   if Source.Size = 0 then exit;
 
-  AudioHandle := BASS_StreamCreateFile(True, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
+  AudioHandle := BASS_StreamCreateFile(BASS_FILE_MEM, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
   if AudioHandle = 0 then
   begin
     Log('BASS couldnt open the audio for decoding. Error code: ' + inttostr(BASS_ErrorGetCode));
@@ -323,7 +323,7 @@ begin
   Result := False;
   if Source.Size = 0 then exit;
 
-  AudioHandle := BASS_StreamCreateFile(True, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
+  AudioHandle := BASS_StreamCreateFile(BASS_FILE_MEM, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
   try
     if BASS_Encode_Start(AudioHandle, PChar('oggenc -q5 ' + TagCommandString + ' -o "' + FileName + '" -'), BASS_ENCODE_AUTOFREE or BASS_UNICODE, nil, nil) <> 0 then
     try
@@ -353,7 +353,7 @@ begin
   Result := False;
   if Source.Size = 0 then exit;
 
-  AudioHandle := BASS_StreamCreateFile(True, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
+  AudioHandle := BASS_StreamCreateFile(BASS_FILE_MEM, Source.Memory, 0, Source.Size, BASS_STREAM_DECODE or BASS_UNICODE);
   try
     if BASS_Encode_Start(AudioHandle, PChar('lame --preset fast standard ' + TagCommandString + ' - "' + FileName + '"'), BASS_ENCODE_AUTOFREE or BASS_UNICODE {or BASS_ENCODE_FP_32BIT}, nil, nil) <> 0 then
     try
