@@ -1,7 +1,7 @@
 {
 ******************************************************
   Telltale Speech Extractor
-  Copyright (c) 2007 - 2014 Bennyboy
+  Copyright (c) 2007 - 2026 Bennyboy
   Http://quickandeasysoftware.net
 ******************************************************
 }
@@ -457,12 +457,15 @@ end;
 function TTelltaleAudioManager.DecodeVOXSpeex(Source, Dest: TStream; const Header: TVoxHeader): boolean;
 var
   i, j, k: integer;
-  StartOfData, ArrayLength, Enhance, DecFrame: integer;
+  StartOfData, ArrayLength, Enhance, DecFrame, NoChannels: integer;
   decbits: TSpeexBits;
   decstate: PSpeexState;
   buffDec: array of SmallInt;
   sourceBytes: array of byte;
   SizesArray: array of integer;
+  Stereo: TSpeexStereoState;
+  StereoCallback: TSpeexCallback;
+  WaveStream: TWaveStream;
 begin
   Result := false;
 
@@ -583,21 +586,62 @@ begin
   speex_decoder_ctl (decstate, SPEEX_SET_ENH, @Enhance); //set enhancement on
 
 
-  J:=sizesarray[0]; //skip the first packet - its the 'encoded by speex' string
-  for I := 1 to ArrayLength - 1 do //skip the first packet
+  {Stereo isn't stored in the header. Stereo files have an in-band stereo message
+   at the start of every frame: bits 0 1110 1001 (narrowband in-band request, id 9).
+   Packet 1 (the first audio packet) is never encrypted so check that}
+  NoChannels := 1;
+  if (ArrayLength > 1) and (SizesArray[1] >= 2) and (SourceBytes[SizesArray[0]] = $74) and
+    (SourceBytes[SizesArray[0] + 1] and $80 <> 0) then
   begin
-    speex_bits_reset (@decbits);
-    speex_bits_read_from(@decbits, @sourceBytes[J], SizesArray[i]);
-    inc(j, SizesArray[i]);
-    if decframe> length (buffDec) then SetLength(buffDec, decframe);
+    if not Assigned(speex_std_stereo_request_handler) then
+      Log('Stereo VOX but speex_std_stereo_request_handler isnt loaded - saving as mono')
+    else
+    begin
+      NoChannels := 2;
 
-    repeat // as long as there is data to decode
-      K:= speex_decode_int (decstate, @decbits, @buffDec[0]); //return 0 for no error, -1 for end of stream, -2 corrupt stream
+      {SPEEX_STEREO_STATE_INIT - not present in delphi wrapper or this dll}
+      Stereo.balance:=1.0;
+      Stereo.e_ratio:=0.5;
+      Stereo.smooth_left:=1;
+      Stereo.smooth_right:=1;
+      Stereo.reserved1:=0;
+      Stereo.reserved2:=0;
 
-      if K = 0 then // a decoded frame
-        Dest.WriteBuffer (buffDec[0], (decframe*2));
+      //The handler reads each frame's stereo message into Stereo
+      StereoCallback.callback_id := SPEEX_INBAND_STEREO;
+      @StereoCallback.func := @speex_std_stereo_request_handler; //Its 2nd param is PSpeexStereoState not PSpeexState, so assign by address
+      StereoCallback.data := @Stereo;
+      StereoCallback.reserved1 := nil;
+      StereoCallback.reserved2 := 0;
+      speex_decoder_ctl (decstate, SPEEX_SET_HANDLER, @StereoCallback);
+    end;
+  end;
 
-    until K <> 0;
+  SetLength(buffDec, decframe * NoChannels); //speex_decode_stereo_int expands the frame in place to 2 channels
+
+  WaveStream:=TWaveStream.Create(Dest, NoChannels, 16, Header.SampleRate);
+  try
+    J:=sizesarray[0]; //skip the first packet - its the 'encoded by speex' string
+    for I := 1 to ArrayLength - 1 do //skip the first packet
+    begin
+      speex_bits_reset (@decbits);
+      speex_bits_read_from(@decbits, @sourceBytes[J], SizesArray[i]);
+      inc(j, SizesArray[i]);
+
+      repeat // as long as there is data to decode
+        K:= speex_decode_int (decstate, @decbits, @buffDec[0]); //return 0 for no error, -1 for end of stream, -2 corrupt stream
+
+        if K = 0 then // a decoded frame
+        begin
+          if NoChannels = 2 then
+            speex_decode_stereo_int(@buffDec[0], decframe, @Stereo);
+          WaveStream.WriteBuffer (@buffDec[0], (decframe * 2 * NoChannels));
+        end;
+
+      until K <> 0;
+    end;
+  finally
+    WaveStream.Free;
   end;
 
   Result := true; //Sort out proper error catching and result later
@@ -1070,18 +1114,18 @@ end;
 function TTelltaleAudioManager.SaveVoxToStream(AStream: TStream): boolean;
 var
   Header: TVoxHeader;
-  WaveStream: TWaveStream;
+
 begin
   Result:=false;
   if fAudioFile = nil then exit;
   AStream.Position:=0;
   Header := ReadVoxHeader(FAudioFile);
-  WaveStream:=TWaveStream.Create(AStream, 1, 16, Header.SampleRate); //Mono - stereo is only stored in-band and isn't supported yet
-  try
-    Result := DecodeVOXSpeex(FAudioFile, WaveStream, Header);
-  finally
-    WaveStream.Free;
-  end;
+  Result := DecodeVOXSpeex(FAudioFile, AStream, Header); //Writes the wav header too, as mono/stereo isn't known until the audio is read
+
+
+
+
+
 end;
 
 function TTelltaleAudioManager.SaveWavToStream(DestStream: TStream): boolean;
@@ -1242,4 +1286,5 @@ begin
 end;
 
 end.
+
 
