@@ -1,18 +1,14 @@
 ﻿# Telltale Speech Extractor
-Version 1.4.6<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
+Version 1.4.7<br>By [Quick and Easy Software](https://quickandeasysoftware.net/)
   
 A program that enables you to rip the voices and sfx from the games developed by Telltale Games. This includes games produced by others using the Telltale engine such as Skunkape Games' Sam & Max remasters.
 
 ## New in this version
--  Fixed The Walking Dead: The Definitive Series. Five episodes weren't showing the speech annotations, this was due to slight changes in some of the filenames in the archives.
-- Lots of fixes to the annotation files including: 
-	- Mispelt character names such as Gubyrush, Gerrry, Sorink, Yorder, Niima. These actually came from the games themselves.
-	- Fixed lost characters shown as '?' in about 2800 lines. These should have been apostrophes, quotes, ellipses, dashes etc and all now show correctly.
-	- Made category/character names  consistent across episodes, eg WhackARat, Computervoice.
-	- Tales From The Borderlands E3 Demo, some entries had the name and sound length reversed.
-	- Fix some garbled characters in Game Of Thrones 102/103 and Minecraft 107.
-	- Added new WallaceAndGromit_Global annotation file for the global_pc_voice.ttarch archives in The Last Resort, Muzzled and The Bogey Man.
-	- Collapsed double spaces and removed stray spaces before punctuation in all annotations.
+- Fixed lower quality speech in VOX games (Sam & Max Season 1 and 2, Bone, CSI 3 Dimensions of Murder, Texas Hold'em, Strong Bad, Wallace & Gromit, Tales of Monkey Island, Hector, Jurassic Park, Law & Order, Poker Night At The Inventory). Most of these files are 32kHz 'ultra-wideband' Speex, but they were decoded at 16kHz. Speech is now saved at its full original sample rate.
+- VOX files are now saved with the correct number of channels. Previously every file was saved as 'stereo' with identical left and right channels. Almost all VOX files are mono and are now saved as mono. The few that really are stereo (mostly sound effects in Bone: The Great Cow Race and Texas Hold'em) are now saved in proper stereo.
+- Fixed Tales of Monkey Island (Wii) VOX files being saved with an invalid sample rate.
+- Fixed rare issue where there were occasional bursts of noise in a few VOX files. This happened in games where only a few audio files are encrypted and the majority are not (Bone 1 and 2, Sam & Max original season 1 and 2).
+- Thanks to webfischi for reporting the low quality issue.
   
  ## What do I need to use this?  
 Just the games themselves.
@@ -24,8 +20,8 @@ Just the games themselves.
     yourself or choose one of the games and the files will automatically
     be found.
  2. Click the _Play Sound_ button or press enter to play the currently selected sound.
- 3. Click _Save File_ to save a sound. You can choose to save as a WAV or OGG file or let the program automatically choose the most appropriate format. OGG files will be tagged with the annotation text.
- 4. Click _Save All Files_ to save the sounds as WAV or OGG or let the program automatically choose the most appropriate format.
+ 3. Click _Save File_ to save a sound. You can choose to save as a WAV, OGG or MP3 file or let the program automatically choose the most appropriate format. OGG and MP3 files will be tagged with the annotation text.
+ 4. Click _Save All Files_ to save the sounds as WAV, OGG or MP3 or let the program automatically choose the most appropriate format.
  5. Click the _Annotations_ button to edit annotations. See the 'Annotations' section below for more information.
 
   
@@ -106,9 +102,9 @@ The tool only rips audio from the speech files. If you want to rip the music fil
 ## Technical details: 
 The speech files used in Telltale games have changed over time, generally speaking there are 4 types of audio file used:  
 
--   (.VOX) Vox V1 - These use the Speex codec to store the speech, however the Speex data is not stored in a vorbis container. The audio is divided up into 'packets', some of which are encrypted.
+-   (.VOX) Vox V1 - These use the Speex codec to store the speech, however the Speex data is not stored in an Ogg container. The audio is divided up into 'packets', one Speex frame per packet. Some files have some of their packets encrypted. 
   
--   (.VOX) Vox V2 - These are esentially the same as Vox V1 - but the file header is different and there's no encryption.
+-   (.VOX) Vox V2 - These are essentially the same as Vox V1, but with a different file header. None of the V2 files seen so far are encrypted.
   
 -   (.AUD) Ogg audio - These are standard Ogg files with an extra header. The format of the header is not always the same and changes between games.
   
@@ -116,22 +112,25 @@ The speech files used in Telltale games have changed over time, generally speaki
   
 
 The way the files are stored has also changed. In earlier games (those released before Strongbad) the audio files were stored individually inside the Pack\\Data\ folder. However later games packed the files inside a .ttarch bundle. To get at these files you have to get them out of the bundle first.  
-  
-To make things even more complicated there's also the issue of encryption. In 'VOX V1' files, packet 0 and every 64th packet are encrypted, so to get correct audio you have to decrypt these. However the encryption keys differ between games. CSI 3 Dimensions of Murder and the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem all use the same key. However the original releases of Sam and Max 102-106 all used different keys.  
-  
-In the last few years though Telltale released updated versions of Sam and Max Season 1, Bone1, Bone2 and Texas Holdem. These now use the VOX V2 format, so aren't encrypted.  
-  
+ 
+To make things even more complicated there's also the issue of encryption. Each VOX file has a flag in its header saying whether it's encrypted. If it is, packet 0 and every 64th packet are encrypted, so to get correct audio you have to decrypt these. However the encryption keys differ between games. CSI 3 Dimensions of Murder, older releases of Sam and Max 101, Bone 1, Bone 2 and Texas Holdem all use the same key. The original releases of Sam and Max 102-106 all used different keys.
+
+Telltale later released updated versions of Sam and Max Season 1, Bone 1, Bone 2 and Texas Holdem. These are still VOX files, but almost all of them are no longer encrypted. Annoyingly, a handful of encrypted files remain, so the program checks every file individually.
+
+Most VOX files use Speex 'ultra-wideband' mode at 32kHz, with a few at 44.1kHz or 22.05kHz. However 'wideband' mode at 16khz was used in the Wii versions of games like Tales of Monkey Island.
+
+Most VOX files use Speex 'ultra-wideband' mode at 32kHz, with a few at 44.1kHz or 22.05kHz. However 'wideband' mode at 16kHz was used in the Wii versions of games like Tales of Monkey Island. Almost all VOX files are mono, a few are stereo (mostly sound effects). Stereo isn't recorded in the file header, the stereo files have stereo information inside the Speex data itself, so the program checks the audio to find them.
+
 To summarise, here is the crazy array of formats and containers that this program supports:
 
--   V1 VOX files that are partially encrypted, with some games using a different key.
-    *  CSI: 3 Dimensions of Murder, the original releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.
+-   V1 VOX files, some encrypted, with some games using a different key.
+    *  CSI: 3 Dimensions of Murder, Sam and Max Season 1 and 2, Bone1, Bone2 and Texas Holdem
 
 -   V2 VOX files with a slightly different format and no encryption.
-    * CSI: Hard Evidence, Sam and Max Season 2, the updated releases of Sam and Max 101, Bone1, Bone2 and Texas Holdem.
+    * CSI: Hard Evidence, Strong Bad, Wallace and Gromit, Tales of Monkey Island, Hector, Jurassic Park, Law & Order and Poker Night At The Inventory.
 
--   AUD (ogg) files packed inside an encrypted .ttarch bundle.
+-   V2 VOX and AUD (ogg) files packed inside an encrypted .ttarch bundle.
     * Strongbad Season 1.
-
   
 -   AUD (ogg) files packed inside a different format, compressed and even more encrypted .ttarch bundle.
 
@@ -190,4 +189,4 @@ All my software is completely free. If you find this program useful please consi
 
   
 
-Last updated 11/10/26
+Last updated 18/10/26
